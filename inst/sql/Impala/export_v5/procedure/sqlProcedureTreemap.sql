@@ -21,7 +21,7 @@ from (select * from @results_database_schema.ACHILLES_results where analysis_id 
 	 from
 		(
 			select c1.concept_id, 
-				v1.vocabulary_name + ' ' + c1.concept_code + ': ' + c1.concept_name as proc_concept_name
+				concat_ws('', v1.vocabulary_name, ' ', c1.concept_code, ': ', c1.concept_name) as proc_concept_name
 			from @cdm_database_schema.concept c1
 				inner join @cdm_database_schema.vocabulary v1
 				on c1.vocabulary_id = v1.vocabulary_id

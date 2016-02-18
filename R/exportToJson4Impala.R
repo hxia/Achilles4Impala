@@ -140,7 +140,7 @@ getCategorySQLPath <- function(categoryName){
 #' \dontrun{
 #' renderedSql <- loadRenderTranslateSql("CohortMethod.sql",
 #'                                       packageName = "CohortMethod",
-#'                                       dbms = connectionDetails$dbms,
+#'                                       dbms = dbms,
 #'                                       CDM_schema = "cdmSchema")
 #' }
 #' 
@@ -209,85 +209,81 @@ trim <- function(string) {
 #' }
 #' 
 #' @export
-exportToJson <- function (conn, cdmDatabaseSchema, resultsDatabaseSchema, outputPath = getwd(), reports = allReports, cdmVersion = "4")
+exportToJson <- function (conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath = getwd(), reports = allReports, cdmVersion = "4")
 {
   start <- Sys.time()
   if (missing(resultsDatabaseSchema))
     resultsDatabaseSchema <- cdmDatabaseSchema
   
   initOutputPath(outputPath)
-  
-  # connect to the results schema
-  #conn$schema = resultsDatabaseSchema
-  
-  # generate reports
-  
+    
+  # generate reports  
   if ("CONDITION" %in% reports)
   {
-    generateConditionTreemap(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)  
-    generateConditionReports(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateConditionTreemap(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)  
+    generateConditionReports(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   }
   
   if ("CONDITION_ERA" %in% reports)
   {
-    generateConditionEraTreemap(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
-    generateConditionEraReports(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateConditionEraTreemap(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateConditionEraReports(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   }
   
   if ("DATA_DENSITY" %in% reports)
-    generateDataDensityReport(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateDataDensityReport(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   
   if ("DEATH" %in% reports)
   {
-    generateDeathReports(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateDeathReports(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   }
   
   if ("DRUG_ERA" %in% reports)
   {
-    generateDrugEraTreemap(conn,connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
-    generateDrugEraReports(conn,connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateDrugEraTreemap(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateDrugEraReports(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   }
   
   if ("DRUG" %in% reports)
   {
-    generateDrugTreemap(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)  
-    generateDrugReports(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateDrugTreemap(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)  
+    generateDrugReports(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   }
   
   if ("HEEL" %in% reports)
   {
-    generateAchillesHeelReport(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateAchillesHeelReport(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   }
   
   if ( ("MEASUREMENT" %in% reports) & (cdmVersion != "4"))
   {
-    generateMeasurementTreemap(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
-    generateMeasurementReports(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateMeasurementTreemap(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateMeasurementReports(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   }
   
   
   if ("OBSERVATION" %in% reports)
   {  
-    generateObservationTreemap(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
-    generateObservationReports(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateObservationTreemap(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateObservationReports(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   }
   
   if ("OBSERVATION_PERIOD" %in% reports)  
-    generateObservationPeriodReport(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateObservationPeriodReport(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   
   if ("PERSON" %in% reports)    
-    generatePersonReport(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generatePersonReport(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   
   if ("PROCEDURE" %in% reports)
   {
-    generateProcedureTreemap(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
-    generateProcedureReports(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateProcedureTreemap(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateProcedureReports(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   }
   
   if ("VISIT" %in% reports)
   {  
-    generateVisitTreemap(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
-    generateVisitReports(conn, connectionDetails$dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateVisitTreemap(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
+    generateVisitReports(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion)
   }
   
   # dashboard is always last

@@ -9,7 +9,9 @@ LazyData: true
 Description: creates descriptive statistics summary for an entire OMOP CDM, and ported from OHDAI/Achilles
     instance.
 Depends:
-    rjson,
+    SqlRender4Impala,
+	DatabaseConnector4Impala,
+	rjson,
 	rJava,
 	RJDBC,
 	DBI

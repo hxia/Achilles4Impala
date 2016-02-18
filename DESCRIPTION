@@ -10,7 +10,7 @@ Description: creates descriptive statistics summary for an entire OMOP CDM, and 
     instance.
 Depends:
     rjson,
-	jJava,
+	rJava,
 	RJDBC,
 	DBI
 Suggests:

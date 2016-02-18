@@ -209,7 +209,7 @@ trim <- function(string) {
 #' }
 #' 
 #' @export
-exportToJson <- function (connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath = getwd(), reports = allReports, cdmVersion = "4")
+exportToJson <- function (conn, cdmDatabaseSchema, resultsDatabaseSchema, outputPath = getwd(), reports = allReports, cdmVersion = "4")
 {
   start <- Sys.time()
   if (missing(resultsDatabaseSchema))
@@ -218,8 +218,7 @@ exportToJson <- function (connectionDetails, cdmDatabaseSchema, resultsDatabaseS
   initOutputPath(outputPath)
   
   # connect to the results schema
-  connectionDetails$schema = resultsDatabaseSchema
-  conn <- connect(connectionDetails)
+  #conn$schema = resultsDatabaseSchema
   
   # generate reports
   

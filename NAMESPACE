@@ -21,3 +21,5 @@ export(fetchAchillesAnalysisResults)
 export(fetchAchillesHeelResults)
 export(getAnalysisDetails)
 export(showReportTypes)
+
+export(loadRenderTranslateSql)

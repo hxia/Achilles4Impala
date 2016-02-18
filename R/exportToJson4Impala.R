@@ -668,7 +668,8 @@ exportVisitToJson <- function (connectionDetails, cdmDatabaseSchema, resultsData
 }
 
 
-addCdmVersionPath <- function(sqlFilename,cdmVersion){
+#' @export
+addCdmVersionPath <- function(sqlFilename,cdmVersion = "5"){
   if (cdmVersion == "4") {
     sqlFolder <- "export_v4"
   } else if (cdmVersion == "5") {

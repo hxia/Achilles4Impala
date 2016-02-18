@@ -9,7 +9,10 @@ LazyData: true
 Description: creates descriptive statistics summary for an entire OMOP CDM, and ported from OHDAI/Achilles
     instance.
 Depends:
-    rjson
+    rjson,
+	jJava,
+	RJDBC,
+	DBI
 Suggests:
     testthat
 License: Apache License

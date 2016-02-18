@@ -1,6 +1,6 @@
 select 	
     concept_hierarchy.concept_id,
-	concat(ws('||', isnull(concept_hierarchy.atc1_concept_name,'NA'),  
+	concat_ws('||', isnull(concept_hierarchy.atc1_concept_name,'NA'),  
 		isnull(concept_hierarchy.atc3_concept_name,'NA'), 
 		isnull(concept_hierarchy.atc5_concept_name,'NA'),
 		isnull(concept_hierarchy.rxnorm_ingredient_concept_name,'NA'),

@@ -153,7 +153,7 @@ loadRenderTranslateSql <- function(sqlFilename,
                                    oracleTempSchema = NULL) {
   
   pathToSql <- paste0(getPackagePath(packageName), "/sql/", dbms, "/", sqlFilename)
-  #writeLines(pathToSql)
+  writeLines(pathToSql)
   
   parameterizedSql <- readChar(pathToSql, file.info(pathToSql)$size)
   writeLines(paste0(parameterizedSql, "\n"))
@@ -821,6 +821,8 @@ generateConditionReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatab
                                                            cdm_database_schema = cdmDatabaseSchema,
 							   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn, queryPrevalenceByGenderAgeYear) 
+  
   
   queryPrevalenceByMonth <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/condition/sqlPrevalenceByMonth.sql",cdmVersion),
                                                    packageName = "Achilles4Impala",
@@ -828,6 +830,8 @@ generateConditionReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatab
                                                    cdm_database_schema = cdmDatabaseSchema,
 						   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByMonth <- dbGetQuery(conn, queryPrevalenceByMonth)  
+  
   
   queryConditionsByType <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/condition/sqlConditionsByType.sql",cdmVersion),
                                                   packageName = "Achilles4Impala",
@@ -835,6 +839,8 @@ generateConditionReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatab
                                                   cdm_database_schema = cdmDatabaseSchema,
 						  results_database_schema = resultsDatabaseSchema
   )
+  dataConditionsByType <- dbGetQuery(conn, queryConditionsByType)    
+  
   
   queryAgeAtFirstDiagnosis <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/condition/sqlAgeAtFirstDiagnosis.sql",cdmVersion),
                                                      packageName = "Achilles4Impala",
@@ -842,11 +848,7 @@ generateConditionReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatab
                                                      cdm_database_schema = cdmDatabaseSchema,
 						     results_database_schema = resultsDatabaseSchema
   )
-  
-  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
-  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)  
-  dataConditionsByType <- dbGetQuery(conn,queryConditionsByType)    
-  dataAgeAtFirstDiagnosis <- dbGetQuery(conn,queryAgeAtFirstDiagnosis)    
+  dataAgeAtFirstDiagnosis <- dbGetQuery(conn, queryAgeAtFirstDiagnosis)    
   
   
   buildConditionReport <- function(concept_id) {
@@ -901,7 +903,9 @@ generateConditionEraReports <- function(conn, dbms, cdmDatabaseSchema, resultsDa
                                                            dbms = dbms,
                                                            cdm_database_schema = cdmDatabaseSchema,
 							   results_database_schema = resultsDatabaseSchema
-  )
+  )  
+  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
+  
   
   queryPrevalenceByMonth <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/conditionera/sqlPrevalenceByMonth.sql",cdmVersion),
                                                    packageName = "Achilles4Impala",
@@ -909,6 +913,8 @@ generateConditionEraReports <- function(conn, dbms, cdmDatabaseSchema, resultsDa
                                                    cdm_database_schema = cdmDatabaseSchema,
 						   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)  
+  
   
   queryAgeAtFirstDiagnosis <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/conditionera/sqlAgeAtFirstDiagnosis.sql",cdmVersion),
                                                      packageName = "Achilles4Impala",
@@ -916,18 +922,16 @@ generateConditionEraReports <- function(conn, dbms, cdmDatabaseSchema, resultsDa
                                                      cdm_database_schema = cdmDatabaseSchema,
 						     results_database_schema = resultsDatabaseSchema
   )
+  dataAgeAtFirstDiagnosis <- dbGetQuery(conn,queryAgeAtFirstDiagnosis)  
+  
   
   queryLengthOfEra <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/conditionera/sqlLengthOfEra.sql",cdmVersion),
                                              packageName = "Achilles4Impala",
                                              dbms = dbms,
                                              cdm_database_schema = cdmDatabaseSchema,
 					     results_database_schema = resultsDatabaseSchema
-  )  
-  
-  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
-  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)  
+  )    
   dataLengthOfEra <- dbGetQuery(conn,queryLengthOfEra)    
-  dataAgeAtFirstDiagnosis <- dbGetQuery(conn,queryAgeAtFirstDiagnosis)    
   
   
   buildConditionEraReport <- function(concept_id) {
@@ -984,6 +988,8 @@ generateDrugEraReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabas
                                                     cdm_database_schema = cdmDatabaseSchema,
 						    results_database_schema = resultsDatabaseSchema
   )
+  dataAgeAtFirstExposure <- dbGetQuery(conn,queryAgeAtFirstExposure) 
+  
   
   queryPrevalenceByGenderAgeYear <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/drugera/sqlPrevalenceByGenderAgeYear.sql",cdmVersion),
                                                            packageName = "Achilles4Impala",
@@ -991,6 +997,8 @@ generateDrugEraReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabas
                                                            cdm_database_schema = cdmDatabaseSchema,
 							   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
+  
   
   queryPrevalenceByMonth <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/drugera/sqlPrevalenceByMonth.sql",cdmVersion),
                                                    packageName = "Achilles4Impala",
@@ -998,18 +1006,17 @@ generateDrugEraReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabas
                                                    cdm_database_schema = cdmDatabaseSchema,
 						   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)
+  
   
   queryLengthOfEra <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/drugera/sqlLengthOfEra.sql",cdmVersion),
                                              packageName = "Achilles4Impala",
                                              dbms = dbms,
                                              cdm_database_schema = cdmDatabaseSchema,
 					     results_database_schema = resultsDatabaseSchema
-  )
-  
-  dataAgeAtFirstExposure <- dbGetQuery(conn,queryAgeAtFirstExposure) 
-  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
-  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)
+  ) 
   dataLengthOfEra <- dbGetQuery(conn,queryLengthOfEra)
+  
   
   buildDrugEraReport <- function(concept_id) {
     report <- {}
@@ -1064,6 +1071,8 @@ generateDrugReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseSc
                                                     cdm_database_schema = cdmDatabaseSchema,
 						    results_database_schema = resultsDatabaseSchema
   )
+  dataAgeAtFirstExposure <- dbGetQuery(conn,queryAgeAtFirstExposure) 
+  
   
   queryDaysSupplyDistribution <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/drug/sqlDaysSupplyDistribution.sql",cdmVersion),
                                                         packageName = "Achilles4Impala",
@@ -1071,6 +1080,8 @@ generateDrugReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseSc
                                                         cdm_database_schema = cdmDatabaseSchema,
 							results_database_schema = resultsDatabaseSchema
   )
+  dataDaysSupplyDistribution <- dbGetQuery(conn,queryDaysSupplyDistribution) 
+  
   
   queryDrugsByType <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/drug/sqlDrugsByType.sql",cdmVersion),
                                              packageName = "Achilles4Impala",
@@ -1078,6 +1089,8 @@ generateDrugReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseSc
                                              cdm_database_schema = cdmDatabaseSchema,
 					     results_database_schema = resultsDatabaseSchema
   )
+  dataDrugsByType <- dbGetQuery(conn,queryDrugsByType) 
+  
   
   queryPrevalenceByGenderAgeYear <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/drug/sqlPrevalenceByGenderAgeYear.sql",cdmVersion),
                                                            packageName = "Achilles4Impala",
@@ -1085,6 +1098,8 @@ generateDrugReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseSc
                                                            cdm_database_schema = cdmDatabaseSchema,
 							   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
+  
   
   queryPrevalenceByMonth <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/drug/sqlPrevalenceByMonth.sql",cdmVersion),
                                                    packageName = "Achilles4Impala",
@@ -1092,6 +1107,8 @@ generateDrugReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseSc
                                                    cdm_database_schema = cdmDatabaseSchema,
 						   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)
+  
   
   queryQuantityDistribution <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/drug/sqlQuantityDistribution.sql",cdmVersion),
                                                       packageName = "Achilles4Impala",
@@ -1099,21 +1116,17 @@ generateDrugReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseSc
                                                       cdm_database_schema = cdmDatabaseSchema,
 						      results_database_schema = resultsDatabaseSchema
   )
+  dataQuantityDistribution <- dbGetQuery(conn,queryQuantityDistribution)
+  
   
   queryRefillsDistribution <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/drug/sqlRefillsDistribution.sql",cdmVersion),
                                                      packageName = "Achilles4Impala",
                                                      dbms = dbms,
                                                      cdm_database_schema = cdmDatabaseSchema,
 						     results_database_schema = resultsDatabaseSchema
-  )
-  
-  dataAgeAtFirstExposure <- dbGetQuery(conn,queryAgeAtFirstExposure) 
-  dataDaysSupplyDistribution <- dbGetQuery(conn,queryDaysSupplyDistribution) 
-  dataDrugsByType <- dbGetQuery(conn,queryDrugsByType) 
-  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
-  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)
-  dataQuantityDistribution <- dbGetQuery(conn,queryQuantityDistribution) 
+  )   
   dataRefillsDistribution <- dbGetQuery(conn,queryRefillsDistribution) 
+  
   
   buildDrugReport <- function(concept_id) {
     report <- {}
@@ -1193,6 +1206,8 @@ generateProcedureReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatab
                                                            cdm_database_schema = cdmDatabaseSchema,
 							   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
+  
   
   queryPrevalenceByMonth <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/procedure/sqlPrevalenceByMonth.sql",cdmVersion),
                                                    packageName = "Achilles4Impala",
@@ -1200,6 +1215,8 @@ generateProcedureReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatab
                                                    cdm_database_schema = cdmDatabaseSchema,
 						   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)  
+  
   
   queryProceduresByType <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/procedure/sqlProceduresByType.sql",cdmVersion),
                                                   packageName = "Achilles4Impala",
@@ -1207,6 +1224,8 @@ generateProcedureReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatab
                                                   cdm_database_schema = cdmDatabaseSchema,
 						  results_database_schema = resultsDatabaseSchema
   )
+  dataProceduresByType <- dbGetQuery(conn,queryProceduresByType)    
+  
   
   queryAgeAtFirstOccurrence <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/procedure/sqlAgeAtFirstOccurrence.sql",cdmVersion),
                                                       packageName = "Achilles4Impala",
@@ -1214,11 +1233,8 @@ generateProcedureReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatab
                                                       cdm_database_schema = cdmDatabaseSchema,
 						      results_database_schema = resultsDatabaseSchema
   )
-  
-  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
-  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)  
-  dataProceduresByType <- dbGetQuery(conn,queryProceduresByType)    
   dataAgeAtFirstOccurrence <- dbGetQuery(conn,queryAgeAtFirstOccurrence)    
+  
   
   buildProcedureReport <- function(concept_id) {
     report <- {}
@@ -1263,6 +1279,7 @@ generatePersonReport <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseS
   )
   
   personSummaryData <- dbGetQuery(conn,renderedSql)
+  
   progress = progress + 1
   setTxtProgressBar(progressBar, progress)
   
@@ -1280,6 +1297,7 @@ generatePersonReport <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseS
 					results_database_schema = resultsDatabaseSchema
   )
   genderData <- dbGetQuery(conn,renderedSql)
+  
   progress = progress + 1
   setTxtProgressBar(progressBar, progress)
   
@@ -1297,6 +1315,7 @@ generatePersonReport <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseS
 					results_database_schema = resultsDatabaseSchema
   )
   raceData <- dbGetQuery(conn,renderedSql)
+  
   progress = progress + 1
   setTxtProgressBar(progressBar, progress)
   
@@ -1314,6 +1333,7 @@ generatePersonReport <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseS
 					results_database_schema = resultsDatabaseSchema
   )
   ethnicityData <- dbGetQuery(conn,renderedSql)
+  
   progress = progress + 1
   setTxtProgressBar(progressBar, progress)
   
@@ -1332,6 +1352,7 @@ generatePersonReport <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseS
 					results_database_schema = resultsDatabaseSchema
   )
   birthYearStats <- dbGetQuery(conn,renderedSql)
+  
   progress = progress + 1
   setTxtProgressBar(progressBar, progress)
   
@@ -1347,6 +1368,7 @@ generatePersonReport <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseS
 					results_database_schema = resultsDatabaseSchema
   )
   birthYearData <- dbGetQuery(conn,renderedSql)
+  
   progress = progress + 1
   setTxtProgressBar(progressBar, progress)
   
@@ -1726,6 +1748,8 @@ generateMeasurementReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                            cdm_database_schema = cdmDatabaseSchema,
 							   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn, queryPrevalenceByGenderAgeYear)
+  
   
   queryPrevalenceByMonth <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/measurement/sqlPrevalenceByMonth.sql",cdmVersion),
                                                    packageName = "Achilles4Impala",
@@ -1733,6 +1757,8 @@ generateMeasurementReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                    cdm_database_schema = cdmDatabaseSchema,
 						   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByMonth <- dbGetQuery(conn, queryPrevalenceByMonth)
+  
   
   queryMeasurementsByType <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/measurement/sqlMeasurementsByType.sql",cdmVersion),
                                                     packageName = "Achilles4Impala",
@@ -1740,6 +1766,8 @@ generateMeasurementReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                     cdm_database_schema = cdmDatabaseSchema,
 						    results_database_schema = resultsDatabaseSchema
   )
+  dataMeasurementsByType <- dbGetQuery(conn,queryMeasurementsByType)
+  
   
   queryAgeAtFirstOccurrence <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/measurement/sqlAgeAtFirstOccurrence.sql",cdmVersion),
                                                       packageName = "Achilles4Impala",
@@ -1747,6 +1775,8 @@ generateMeasurementReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                       cdm_database_schema = cdmDatabaseSchema,
 						      results_database_schema = resultsDatabaseSchema
   )
+  dataAgeAtFirstOccurrence <- dbGetQuery(conn,queryAgeAtFirstOccurrence)
+  
   
   queryRecordsByUnit <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/measurement/sqlRecordsByUnit.sql",cdmVersion),
                                                packageName = "Achilles4Impala",
@@ -1754,6 +1784,8 @@ generateMeasurementReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                cdm_database_schema = cdmDatabaseSchema,
 					       results_database_schema = resultsDatabaseSchema
   )
+  dataRecordsByUnit <- dbGetQuery(conn,queryRecordsByUnit)
+  
   
   queryMeasurementValueDistribution <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/measurement/sqlMeasurementValueDistribution.sql",cdmVersion),
                                                               packageName = "Achilles4Impala",
@@ -1761,6 +1793,8 @@ generateMeasurementReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                               cdm_database_schema = cdmDatabaseSchema,
 							      results_database_schema = resultsDatabaseSchema
   )
+  dataMeasurementValueDistribution <- dbGetQuery(conn,queryMeasurementValueDistribution)
+  
   
   queryLowerLimitDistribution <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/measurement/sqlLowerLimitDistribution.sql",cdmVersion),
                                                         packageName = "Achilles4Impala",
@@ -1768,6 +1802,8 @@ generateMeasurementReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                         cdm_database_schema = cdmDatabaseSchema,
 							results_database_schema = resultsDatabaseSchema
   )
+  dataLowerLimitDistribution <- dbGetQuery(conn,queryLowerLimitDistribution)
+  
   
   queryUpperLimitDistribution <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/measurement/sqlUpperLimitDistribution.sql",cdmVersion),
                                                         packageName = "Achilles4Impala",
@@ -1775,23 +1811,17 @@ generateMeasurementReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                         cdm_database_schema = cdmDatabaseSchema,
 							results_database_schema = resultsDatabaseSchema
   )
+  dataUpperLimitDistribution <- dbGetQuery(conn,queryUpperLimitDistribution)
+  
   
   queryValuesRelativeToNorm <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/measurement/sqlValuesRelativeToNorm.sql",cdmVersion),
                                                       packageName = "Achilles4Impala",
                                                       dbms = dbms,
                                                       cdm_database_schema = cdmDatabaseSchema,
 						      results_database_schema = resultsDatabaseSchema
-  )
-  
-  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
-  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)  
-  dataMeasurementsByType <- dbGetQuery(conn,queryMeasurementsByType)    
-  dataAgeAtFirstOccurrence <- dbGetQuery(conn,queryAgeAtFirstOccurrence)
-  dataRecordsByUnit <- dbGetQuery(conn,queryRecordsByUnit)
-  dataMeasurementValueDistribution <- dbGetQuery(conn,queryMeasurementValueDistribution)
-  dataLowerLimitDistribution <- dbGetQuery(conn,queryLowerLimitDistribution)
-  dataUpperLimitDistribution <- dbGetQuery(conn,queryUpperLimitDistribution)
+  )   
   dataValuesRelativeToNorm <- dbGetQuery(conn,queryValuesRelativeToNorm)
+  
   
   buildMeasurementReport <- function(concept_id) {
     report <- {}
@@ -1877,6 +1907,8 @@ generateObservationReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                            cdm_database_schema = cdmDatabaseSchema,
 							   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
+  
   
   queryPrevalenceByMonth <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/observation/sqlPrevalenceByMonth.sql",cdmVersion),
                                                    packageName = "Achilles4Impala",
@@ -1884,6 +1916,8 @@ generateObservationReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                    cdm_database_schema = cdmDatabaseSchema,
 						   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth) 
+  
   
   queryObservationsByType <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/observation/sqlObservationsByType.sql",cdmVersion),
                                                     packageName = "Achilles4Impala",
@@ -1891,6 +1925,8 @@ generateObservationReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                     cdm_database_schema = cdmDatabaseSchema,
 						    results_database_schema = resultsDatabaseSchema
   )
+  dataObservationsByType <- dbGetQuery(conn,queryObservationsByType) 
+  
   
   queryAgeAtFirstOccurrence <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/observation/sqlAgeAtFirstOccurrence.sql",cdmVersion),
                                                       packageName = "Achilles4Impala",
@@ -1898,6 +1934,8 @@ generateObservationReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                       cdm_database_schema = cdmDatabaseSchema,
 						      results_database_schema = resultsDatabaseSchema
   )
+  dataAgeAtFirstOccurrence <- dbGetQuery(conn,queryAgeAtFirstOccurrence)
+  
   
   if (cdmVersion == "4")
   {
@@ -1908,6 +1946,8 @@ generateObservationReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                  cdm_database_schema = cdmDatabaseSchema,
 						 results_database_schema = resultsDatabaseSchema
     )
+    dataRecordsByUnit <- dbGetQuery(conn,queryRecordsByUnit)
+    
     
     queryObservationValueDistribution <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/observation/sqlObservationValueDistribution.sql",cdmVersion),
                                                                 packageName = "Achilles4Impala",
@@ -1915,6 +1955,8 @@ generateObservationReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                                 cdm_database_schema = cdmDatabaseSchema,
 								results_database_schema = resultsDatabaseSchema
     )
+    dataObservationValueDistribution <- dbGetQuery(conn,queryObservationValueDistribution)
+    
     
     queryLowerLimitDistribution <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/observation/sqlLowerLimitDistribution.sql",cdmVersion),
                                                           packageName = "Achilles4Impala",
@@ -1922,6 +1964,8 @@ generateObservationReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                           cdm_database_schema = cdmDatabaseSchema,
 							  results_database_schema = resultsDatabaseSchema
     )
+    dataLowerLimitDistribution <- dbGetQuery(conn,queryLowerLimitDistribution)
+    
     
     queryUpperLimitDistribution <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/observation/sqlUpperLimitDistribution.sql",cdmVersion),
                                                           packageName = "Achilles4Impala",
@@ -1929,6 +1973,8 @@ generateObservationReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                           cdm_database_schema = cdmDatabaseSchema,
 							  results_database_schema = resultsDatabaseSchema
     )
+    dataUpperLimitDistribution <- dbGetQuery(conn,queryUpperLimitDistribution)
+    
     
     queryValuesRelativeToNorm <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/observation/sqlValuesRelativeToNorm.sql",cdmVersion),
                                                         packageName = "Achilles4Impala",
@@ -1936,19 +1982,9 @@ generateObservationReports <- function(conn, dbms, cdmDatabaseSchema, resultsDat
                                                         cdm_database_schema = cdmDatabaseSchema,
 							results_database_schema = resultsDatabaseSchema
     )
-  }  
-  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
-  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)  
-  dataObservationsByType <- dbGetQuery(conn,queryObservationsByType)    
-  dataAgeAtFirstOccurrence <- dbGetQuery(conn,queryAgeAtFirstOccurrence)
-  if (cdmVersion == "4")
-  {
-    dataRecordsByUnit <- dbGetQuery(conn,queryRecordsByUnit)
-    dataObservationValueDistribution <- dbGetQuery(conn,queryObservationValueDistribution)
-    dataLowerLimitDistribution <- dbGetQuery(conn,queryLowerLimitDistribution)
-    dataUpperLimitDistribution <- dbGetQuery(conn,queryUpperLimitDistribution)
     dataValuesRelativeToNorm <- dbGetQuery(conn,queryValuesRelativeToNorm)
-  }
+  }  
+  
   
   buildObservationReport <- function(concept_id) {
     report <- {}
@@ -2035,6 +2071,8 @@ generateVisitReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseS
                                                            cdm_database_schema = cdmDatabaseSchema,
 							   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
+  
   
   queryPrevalenceByMonth <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/visit/sqlPrevalenceByMonth.sql",cdmVersion),
                                                    packageName = "Achilles4Impala",
@@ -2042,6 +2080,8 @@ generateVisitReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseS
                                                    cdm_database_schema = cdmDatabaseSchema,
 						   results_database_schema = resultsDatabaseSchema
   )
+  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)  
+  
   
   queryVisitDurationByType <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/visit/sqlVisitDurationByType.sql",cdmVersion),
                                                      packageName = "Achilles4Impala",
@@ -2049,18 +2089,17 @@ generateVisitReports <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseS
                                                      cdm_database_schema = cdmDatabaseSchema,
 						     results_database_schema = resultsDatabaseSchema
   )
+  dataVisitDurationByType <- dbGetQuery(conn,queryVisitDurationByType) 
+  
   
   queryAgeAtFirstOccurrence <- loadRenderTranslateSql(sqlFilename = addCdmVersionPath("/visit/sqlAgeAtFirstOccurrence.sql",cdmVersion),
                                                       packageName = "Achilles4Impala",
                                                       dbms = dbms,
                                                       cdm_database_schema = cdmDatabaseSchema,
 						      results_database_schema = resultsDatabaseSchema
-  )
-  
-  dataPrevalenceByGenderAgeYear <- dbGetQuery(conn,queryPrevalenceByGenderAgeYear) 
-  dataPrevalenceByMonth <- dbGetQuery(conn,queryPrevalenceByMonth)  
-  dataVisitDurationByType <- dbGetQuery(conn,queryVisitDurationByType)    
+  )     
   dataAgeAtFirstOccurrence <- dbGetQuery(conn,queryAgeAtFirstOccurrence)    
+  
   
   buildVisitReport <- function(concept_id) {
     report <- {}

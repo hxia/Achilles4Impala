@@ -1,6 +1,6 @@
 select 
-    concat_ws('||', concept_hierarchy.rxnorm_ingredient_concept_id concept_id, 
-		isnull(concept_hierarchy.atc1_concept_name,'NA'), 
+    concept_hierarchy.rxnorm_ingredient_concept_id as concept_id, 
+	concat_ws('||', isnull(concept_hierarchy.atc1_concept_name,'NA'), 
 		isnull(concept_hierarchy.atc3_concept_name,'NA'),
 		isnull(concept_hierarchy.atc5_concept_name,'NA'),
 		isnull(concept_hierarchy.rxnorm_ingredient_concept_name,'||')) as concept_path,

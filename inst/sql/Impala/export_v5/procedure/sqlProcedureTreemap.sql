@@ -1,6 +1,6 @@
 select 	
-    concat_ws('||', cast(concept_hierarchy.concept_id as string),
-		isNull(concept_hierarchy.level4_concept_name,'NA'),
+    concept_hierarchy.concept_id,
+	concat_ws('||', isNull(concept_hierarchy.level4_concept_name,'NA'),
 		isNull(concept_hierarchy.level3_concept_name,'NA'), 
 		isNull(concept_hierarchy.level2_concept_name,'NA'),
 		isNull(concept_hierarchy.proc_concept_name,'NA')) as concept_path,

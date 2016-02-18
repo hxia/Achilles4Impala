@@ -9,23 +9,23 @@ from @results_database_schema.ACHILLES_results ar1
        on ar1.stratum_1 = cast(c1.concept_id as string)
        inner join
        (
-       select concept_id,
-             case when concept_name like 'Inpatient%' then 10
+       select concept_id, 
+			 concat_ws('', 
+				cast((case when concept_name like 'Inpatient%' then 10
                     when concept_name like 'Outpatient%' then 20
-                    else concept_id end  
-                    +
-                    case when (concept_name like 'Inpatient%' or concept_name like 'Outpatient%' ) and (concept_name like '%primary%' or concept_name like '%1st position%') then 1
+                    else concept_id end)  as string),
+				cast((case when (concept_name like 'Inpatient%' or concept_name like 'Outpatient%' ) and (concept_name like '%primary%' or concept_name like '%1st position%') then 1
                     when (concept_name like 'Inpatient%' or concept_name like 'Outpatient%' ) and (concept_name not like '%primary%' and concept_name not like '%1st position%') then 2
-                    else 0 end as concept_group_id,
-             case when concept_name like 'Inpatient%' then 'Claim- Inpatient: '
+                    else 0 end) as string)
+			  ) as concept_group_id,
+             concat_ws(' ', 
+				case when concept_name like 'Inpatient%' then 'Claim- Inpatient: '
                     when concept_name like 'Outpatient%' then 'Claim- Outpatient: '
-                    else concept_name end  
-                    +
-                    ''
-                    +
-                    case when (concept_name like 'Inpatient%' or concept_name like 'Outpatient%' ) and (concept_name like '%primary%' or concept_name like '%1st position%') then 'Primary diagnosis'
+                    else concept_name end, 
+                case when (concept_name like 'Inpatient%' or concept_name like 'Outpatient%' ) and (concept_name like '%primary%' or concept_name like '%1st position%') then 'Primary diagnosis'
                     when (concept_name like 'Inpatient%' or concept_name like 'Outpatient%' ) and (concept_name not like '%primary%' and concept_name not like '%1st position%') then 'Secondary diagnosis'
-                    else '' end as concept_group_name
+                    else '' end
+			 ) as concept_group_name
        from @cdm_database_schema.concept
        where lower(domain_id) = 'condition type' 
        ) c2

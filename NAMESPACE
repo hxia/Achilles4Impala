@@ -23,3 +23,7 @@ export(getAnalysisDetails)
 export(showReportTypes)
 
 export(loadRenderTranslateSql)
+export(getConnection)
+export(getPackagePath)
+export(getCategorySQLPath)
+export(renderSql)

@@ -64,6 +64,124 @@ showReportTypes <- function()
   View(allReports)
 }
 
+
+#' @title getConnection
+#' 
+#' @description
+#' \code{getConnection} Create a connection to Impala
+
+getConnection <- function(serverIP = "10.120.42.20", 
+                          port = "21050",
+                          packageName = "Achilles4Impala") {
+  
+  packagePath <- find.package(packageName, lib.loc=NULL, quiet = TRUE)
+  
+  drv <- JDBC(driverClass = "org.apache.hive.jdbc.HiveDriver",
+              classPath = list.files(paste0(packagePath, "/java/impala-jdbc-0.5-2"), pattern="jar$", full.names=T),
+              identifier.quote="`")
+  
+  conn <- dbConnect(drv, paste("jdbc:hive2://", serverIP, ":", port, "/;auth=noSasl", sep=""))
+  
+  return(conn)
+}
+
+
+
+#' @title getPackagePath
+#' 
+#' @description
+#' \code{getPackagePath} retrive the abosulte path of the package
+
+getPackagePath <- function(packageName = "Achilles4Impala"){
+  return(find.package(packageName, lib.loc=NULL, quiet = TRUE))  
+}
+
+
+
+#' @title getImpalaSqlPath
+#' 
+#' @description
+#' \code{getImpalaSqlPath} retrive the abosulte path of Impala sql inside of the package
+
+getCategorySQLPath <- function(categoryName){
+  return (paste0(getPackagePath(), "/sql/Impala/export_v5/", categoryName))
+}
+
+
+#' @title loadRenderTranslateSql
+#' 
+#' Load, render, and translate a SQL file in a package
+#'
+#' @description
+#' \code{loadRenderTranslateSql} Loads a SQL file contained in a package, renders it and translates it
+#' to the specified dialect
+#'
+#' @details
+#' This function looks for a SQL file with the specified name in the inst/sql/<dbms> folder of the
+#' specified package. If it doesn't find it in that folder, it will try and load the file from the
+#' inst/sql/sql_server folder and use the \code{translateSql} function to translate it to the
+#' requested dialect. It will subsequently call the \code{renderSql} function with any of the
+#' additional specified parameters.
+#'
+#'
+#' @param sqlFilename        The source SQL file
+#' @param packageName        The name of the package that contains the SQL file
+#' @param dbms               The target dialect. Currently 'sql server', 'oracle', 'postgres', and
+#'                           'redshift' are supported
+#' @param ...                Parameter values used for \code{renderSql}
+#' @param oracleTempSchema   A schema that can be used to create temp tables in when using Oracle.
+#'
+#' @return
+#' Returns a string containing the rendered SQL.
+#' @examples
+#' \dontrun{
+#' renderedSql <- loadRenderTranslateSql("CohortMethod.sql",
+#'                                       packageName = "CohortMethod",
+#'                                       dbms = connectionDetails$dbms,
+#'                                       CDM_schema = "cdmSchema")
+#' }
+#' @export
+
+loadRenderTranslateSql <- function(sqlFilename,
+                                   packageName = "Achilles4Impala",
+                                   dbms = "Impala",
+                                   cdm_database_schema,
+                                   results_database_schema,
+                                   oracleTempSchema = NULL) {
+  
+  pathToSql <- paste0(getPackagePath(packageName), "/sql/", dbms, "/", sqlFilename)
+  writeLines(pathToSql)
+  
+  parameterizedSql <- readChar(pathToSql, file.info(pathToSql)$size)
+  writeLines(parameterizedSql)
+  
+  renderedSql <- renderSql(cdm_database_schema, results_database_schema, parameterizedSql)
+  writeLines(renderedSql)
+  
+  renderedSql
+}
+
+
+#' @title renderSql
+#' #'
+#' @description  substitute parameters inside SQL script, 
+#'               such as @results_database_schema and @cdm_database_schema
+#'              
+renderSql <- function(cdm_database_schema, results_database_schema, sqlString){
+  
+  sql_1 <- gsub("@cdm_database_schema", cdm_database_schema, sqlString)
+  sql <- gsub("@results_database_schema", results_database_schema, sql_1)
+  return(sql)
+}
+
+
+
+trim <- function(string) {
+  gsub("(^ +)|( +$)", "", string)
+}
+
+
+
 #' @title exportToJson
 #'
 #' @description
@@ -181,6 +299,7 @@ exportToJson <- function (connectionDetails, cdmDatabaseSchema, resultsDatabaseS
   writeLines(paste("JSON files can now be found in",outputPath))
 }
 
+
 #' @title exportConditionToJson
 #'
 #' @description
@@ -206,6 +325,7 @@ exportConditionToJson <- function (connectionDetails, cdmDatabaseSchema, results
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("CONDITION"), cdmVersion)  
 }
 
+
 #' @title exportConditionEraToJson
 #'
 #' @description
@@ -230,6 +350,7 @@ exportConditionEraToJson <- function (connectionDetails, cdmDatabaseSchema, resu
 {
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("CONDITION_ERA"), cdmVersion)  
 }
+
 
 #' @title exportDashboardToJson
 #'
@@ -257,6 +378,7 @@ exportDashboardToJson <- function (connectionDetails, cdmDatabaseSchema, results
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("DASHBOARD"), cdmVersion)  
 }
 
+
 #' @title exportDataDensityToJson
 #'
 #' @description
@@ -281,6 +403,7 @@ exportDataDensityToJson <- function (connectionDetails, cdmDatabaseSchema, resul
 {
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("DATA_DENSITY"), cdmVersion)  
 }
+
 
 #' @title exportDeathToJson
 #'
@@ -307,6 +430,7 @@ exportDeathToJson <- function (connectionDetails, cdmDatabaseSchema, resultsData
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("DEATH"), cdmVersion)  
 }
 
+
 #' @title exportDrugToJson
 #'
 #' @description
@@ -331,6 +455,7 @@ exportDrugToJson <- function (connectionDetails, cdmDatabaseSchema, resultsDatab
 {
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("DRUG"), cdmVersion)  
 }
+
 
 #' @title exportDrugEraToJson
 #'
@@ -357,6 +482,7 @@ exportDrugEraToJson <- function (connectionDetails, cdmDatabaseSchema, resultsDa
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("DRUG_ERA"), cdmVersion)  
 }
 
+
 #' @title exportHeelToJson
 #'
 #' @description
@@ -381,6 +507,7 @@ exportHeelToJson <- function (connectionDetails, cdmDatabaseSchema, resultsDatab
 {
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("HEEL"), cdmVersion)  
 }
+
 
 #' @title exportMeasurementToJson
 #'
@@ -407,6 +534,7 @@ exportMeasurementToJson <- function (connectionDetails, cdmDatabaseSchema, resul
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("MEASUREMENT"), cdmVersion)  
 }
 
+
 #' @title exportObservationToJson
 #'
 #' @description
@@ -431,6 +559,7 @@ exportObservationToJson <- function (connectionDetails, cdmDatabaseSchema, resul
 {
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("OBSERVATION"), cdmVersion)  
 }
+
 
 #' @title exportObservationPeriodToJson
 #'
@@ -457,6 +586,7 @@ exportObservationPeriodToJson <- function (connectionDetails, cdmDatabaseSchema,
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("OBSERVATION_PERIOD"), cdmVersion)  
 }
 
+
 #' @title exportPersonToJson
 #'
 #' @description
@@ -482,6 +612,7 @@ exportPersonToJson <- function (connectionDetails, cdmDatabaseSchema, resultsDat
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("PERSON"), cdmVersion)  
 }
 
+
 #' @title exportProcedureToJson
 #'
 #' @description
@@ -506,6 +637,7 @@ exportProcedureToJson <- function (connectionDetails, cdmDatabaseSchema, results
 {
   exportToJson(connectionDetails, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, reports = c("PROCEDURE"), cdmVersion)  
 }
+
 
 #' @title exportVisitToJson
 #'
@@ -545,16 +677,18 @@ addCdmVersionPath <- function(sqlFilename,cdmVersion){
 }
 
 
-#' @title loadRenderTranslateSql
+#' @title generateAchillesHeelReport
 #'
 #' @description
-#' \code{loadRenderTranslateSql} Read and render SQL script, and replace OHDSI/DatabaseConnector's same function for now
-
-
-loadRenderTranslateSql <- 
-
-
+#' \code{generateAchillesHeelReport} Exports Achilles Heel report into a JSON form for reports.
+#'
+#' @details
+#' Creates individual files for heel report found in Achilles.Web
+#'
+#' @return none 
+#' 
 generateAchillesHeelReport <- function(conn, dbms, cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion = "4") {
+
   writeLines("Generating achilles heel report")
   output <- {}
   
@@ -569,6 +703,7 @@ generateAchillesHeelReport <- function(conn, dbms, cdmDatabaseSchema, resultsDat
   jsonOutput = toJSON(output)
   write(jsonOutput, file=paste(outputPath, "/achillesheel.json", sep=""))  
 }
+
 
 generateDrugEraTreemap <- function(conn, dbms,cdmDatabaseSchema, resultsDatabaseSchema, outputPath, cdmVersion = "4") {
   writeLines("Generating drug era treemap")

@@ -69,7 +69,8 @@ showReportTypes <- function()
 #' 
 #' @description
 #' \code{getConnection} Create a connection to Impala
-
+#' 
+#' @export 
 getConnection <- function(serverIP = "10.120.42.20", 
                           port = "21050",
                           packageName = "Achilles4Impala") {
@@ -91,7 +92,8 @@ getConnection <- function(serverIP = "10.120.42.20",
 #' 
 #' @description
 #' \code{getPackagePath} retrive the abosulte path of the package
-
+#' 
+#' #' @export 
 getPackagePath <- function(packageName = "Achilles4Impala"){
   return(find.package(packageName, lib.loc=NULL, quiet = TRUE))  
 }
@@ -102,7 +104,8 @@ getPackagePath <- function(packageName = "Achilles4Impala"){
 #' 
 #' @description
 #' \code{getImpalaSqlPath} retrive the abosulte path of Impala sql inside of the package
-
+#' 
+#' @export
 getCategorySQLPath <- function(categoryName){
   return (paste0(getPackagePath(), "/sql/Impala/export_v5/", categoryName))
 }
@@ -141,7 +144,6 @@ getCategorySQLPath <- function(categoryName){
 #'                                       CDM_schema = "cdmSchema")
 #' }
 #' @export
-
 loadRenderTranslateSql <- function(sqlFilename,
                                    packageName = "Achilles4Impala",
                                    dbms = "Impala",
@@ -166,7 +168,8 @@ loadRenderTranslateSql <- function(sqlFilename,
 #' #'
 #' @description  substitute parameters inside SQL script, 
 #'               such as @results_database_schema and @cdm_database_schema
-#'              
+#'  
+#' @export            
 renderSql <- function(cdm_database_schema, results_database_schema, sqlString){
   
   sql_1 <- gsub("@cdm_database_schema", cdm_database_schema, sqlString)

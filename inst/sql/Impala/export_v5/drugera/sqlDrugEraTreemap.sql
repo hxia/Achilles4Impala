@@ -1,8 +1,9 @@
-select concept_hierarchy.rxnorm_ingredient_concept_id concept_id, 
-	isnull(concept_hierarchy.atc1_concept_name,'NA') + '||' + 
-	isnull(concept_hierarchy.atc3_concept_name,'NA') + '||' +
-	isnull(concept_hierarchy.atc5_concept_name,'NA') + '||' +
-	isnull(concept_hierarchy.rxnorm_ingredient_concept_name,'||') concept_path,
+select 
+    concat_ws('||', concept_hierarchy.rxnorm_ingredient_concept_id concept_id, 
+		isnull(concept_hierarchy.atc1_concept_name,'NA'), 
+		isnull(concept_hierarchy.atc3_concept_name,'NA'),
+		isnull(concept_hierarchy.atc5_concept_name,'NA'),
+		isnull(concept_hierarchy.rxnorm_ingredient_concept_name,'||')) as concept_path,
 	ar1.count_value as num_persons, 
 	1.0*ar1.count_value / denom.count_value as percent_persons,
 	ar2.avg_value as length_of_era
@@ -44,7 +45,6 @@ from (select * from @results_database_schema.ACHILLES_results where analysis_id 
 			group by c1.concept_id
 			) rxnorm_to_atc5
 		on rxnorm.rxnorm_ingredient_concept_id = rxnorm_to_atc5.rxnorm_ingredient_concept_id
-
 		left join
 			(select c1.concept_id as atc5_concept_id, c1.concept_name as atc5_concept_name, max(c2.concept_id) as atc3_concept_id
 			from
@@ -62,7 +62,6 @@ from (select * from @results_database_schema.ACHILLES_results where analysis_id 
 			group by c1.concept_id, c1.concept_name
 			) atc5_to_atc3
 		on rxnorm_to_atc5.atc5_concept_id = atc5_to_atc3.atc5_concept_id
-
 		left join
 			(select c1.concept_id as atc3_concept_id, c1.concept_name as atc3_concept_name, max(c2.concept_id) as atc1_concept_id
 			from
@@ -80,7 +79,6 @@ from (select * from @results_database_schema.ACHILLES_results where analysis_id 
 			group by c1.concept_id, c1.concept_name
 			) atc3_to_atc1
 		on atc5_to_atc3.atc3_concept_id = atc3_to_atc1.atc3_concept_id
-
 		left join @cdm_database_schema.concept atc1
 		 on atc3_to_atc1.atc1_concept_id = atc1.concept_id
 	) concept_hierarchy

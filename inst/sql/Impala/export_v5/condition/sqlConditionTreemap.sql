@@ -1,5 +1,10 @@
 select   concept_hierarchy.concept_id,
-  isNull(concept_hierarchy.soc_concept_name,'NA') + '||' + isNull(concept_hierarchy.hlgt_concept_name,'NA') + '||' + isNull(concept_hierarchy.hlt_concept_name,'NA') + '||' + isNull(concept_hierarchy.pt_concept_name,'NA') + '||' + isNull(concept_hierarchy.snomed_concept_name,'NA') concept_path,	ar1.count_value as num_persons, 
+    concat_ws('||', isNull(concept_hierarchy.soc_concept_name, 'NA'),  
+				    isNull(concept_hierarchy.hlgt_concept_name, 'NA'), 
+					isNull(concept_hierarchy.hlt_concept_name, 'NA'), 
+					isNull(concept_hierarchy.pt_concept_name, 'NA'), 
+					isNull(concept_hierarchy.snomed_concept_name, 'NA')) as concept_path,
+	ar1.count_value as num_persons, 
 	round(1.0*ar1.count_value / denom.count_value,5) as percent_persons,
 	round(1.0*ar2.count_value / ar1.count_value,5) as records_per_person
 from (select * from @results_database_schema.ACHILLES_results where analysis_id = 400) ar1
@@ -36,7 +41,6 @@ from (select * from @results_database_schema.ACHILLES_results where analysis_id 
 			group by c1.concept_id
 			) snomed_to_pt
 		on snomed.concept_id = snomed_to_pt.snomed_concept_id
-
 		left join
 			(select c1.concept_id as pt_concept_id, c1.concept_name as pt_concept_name, max(c2.concept_id) as hlt_concept_id
 			from
@@ -53,7 +57,6 @@ from (select * from @results_database_schema.ACHILLES_results where analysis_id 
 			group by c1.concept_id, c1.concept_name
 			) pt_to_hlt
 		on snomed_to_pt.pt_concept_id = pt_to_hlt.pt_concept_id
-
 		left join
 			(select c1.concept_id as hlt_concept_id, c1.concept_name as hlt_concept_name, max(c2.concept_id) as hlgt_concept_id
 			from
@@ -70,7 +73,6 @@ from (select * from @results_database_schema.ACHILLES_results where analysis_id 
 			group by c1.concept_id, c1.concept_name
 			) hlt_to_hlgt
 		on pt_to_hlt.hlt_concept_id = hlt_to_hlgt.hlt_concept_id
-
 		left join
 			(select c1.concept_id as hlgt_concept_id, c1.concept_name as hlgt_concept_name, max(c2.concept_id) as soc_concept_id
 			from
@@ -87,12 +89,10 @@ from (select * from @results_database_schema.ACHILLES_results where analysis_id 
 			group by c1.concept_id, c1.concept_name
 			) hlgt_to_soc
 		on hlt_to_hlgt.hlgt_concept_id = hlgt_to_soc.hlgt_concept_id
-
 		left join @cdm_database_schema.concept soc
 		 on hlgt_to_soc.soc_concept_id = soc.concept_id
 	) concept_hierarchy
 	on ar1.stratum_1 = CAST(concept_hierarchy.concept_id as VARCHAR)
 	,
 	(select count_value from @results_database_schema.ACHILLES_results where analysis_id = 1) denom
-
 order by ar1.count_value desc

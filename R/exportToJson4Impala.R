@@ -153,13 +153,13 @@ loadRenderTranslateSql <- function(sqlFilename,
                                    oracleTempSchema = NULL) {
   
   pathToSql <- paste0(getPackagePath(packageName), "/sql/", dbms, "/", sqlFilename)
-  writeLines(pathToSql)
+  #writeLines(pathToSql)
   
   parameterizedSql <- readChar(pathToSql, file.info(pathToSql)$size)
-  writeLines(parameterizedSql)
+  writeLines(paste0(parameterizedSql, "\n"))
   
   renderedSql <- renderSql(cdm_database_schema, results_database_schema, parameterizedSql)
-  writeLines(renderedSql)
+  writeLines(paste0(renderedSql, "\n\n"))
   
   renderedSql
 }

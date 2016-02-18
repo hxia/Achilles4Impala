@@ -1,8 +1,9 @@
-select 	concept_hierarchy.concept_id,
-	isNull(concept_hierarchy.level3_concept_name,'NA') 
-	+ '||' + isNull(concept_hierarchy.level2_concept_name,'NA')
-	+ '||' + isNull(concept_hierarchy.level1_concept_name,'NA')
-	+ '||' + isNull(concept_hierarchy.concept_name, 'NA') as concept_path,
+select 	
+    concat_ws('||', cast(concept_hierarchy.concept_id as string),
+		isNull(concept_hierarchy.level3_concept_name,'NA'), 
+		isNull(concept_hierarchy.level2_concept_name,'NA'),
+		isNull(concept_hierarchy.level1_concept_name,'NA'),
+		isNull(concept_hierarchy.concept_name, 'NA')) as concept_path,
 	ar1.count_value as num_persons, 
 	1.0*ar1.count_value / denom.count_value as percent_persons,
 	1.0*ar2.count_value / ar1.count_value as records_per_person

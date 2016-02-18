@@ -6,7 +6,7 @@ select c1.concept_id as condition_concept_id,
 from @results_database_schema.ACHILLES_results ar1
        inner join
        @cdm_database_schema.concept c1
-       on ar1.stratum_1 = cast(c1.concept_id as VARCHAR)
+       on ar1.stratum_1 = cast(c1.concept_id as string)
        inner join
        (
        select concept_id,
@@ -28,9 +28,8 @@ from @results_database_schema.ACHILLES_results ar1
                     else '' end as concept_group_name
        from @cdm_database_schema.concept
        where lower(domain_id) = 'condition type' 
-       
        ) c2
-       on ar1.stratum_2 = cast(c2.concept_id as VARCHAR)
+       on ar1.stratum_2 = cast(c2.concept_id as string)
 where ar1.analysis_id = 405
 group by c1.concept_id, 
        c1.concept_name,

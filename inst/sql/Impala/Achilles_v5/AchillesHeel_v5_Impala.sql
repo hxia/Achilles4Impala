@@ -1,30 +1,3 @@
-/******************************************************************
-
-# @file ACHILLESHEEL.SQL
-#
-# Copyright 2014 Observational Health Data Sciences and Informatics
-#
-# This file is part of ACHILLES
-# 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-# 
-#     http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
-# @author Observational Health Data Sciences and Informatics
-
-
-
-
-*******************************************************************/
-
 
 /*******************************************************************
 Achilles Heel - data quality assessment based on database profiling summary statistics
@@ -40,7 +13,7 @@ CREATE TABLE ACHILLES_HEEL_results (
     analysis_id INT,
 	ACHILLES_HEEL_warning string,
 	rule_id INT,
-	record_count INT
+	record_count BIGINT
 );
 
 
@@ -52,7 +25,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT DISTINCT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; count (n=' + cast(or1.count_value as string) + ') should not be > 0' AS ACHILLES_HEEL_warning,
+	concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; count (n=', cast(or1.count_value as string), ') should not be > 0') AS ACHILLES_HEEL_warning,
 	1 as rule_id,
 	or1.count_value
 FROM ACHILLES_results or1
@@ -114,8 +87,9 @@ INSERT INTO ACHILLES_HEEL_results (
 	rule_id,
 	record_count
 )
-SELECT DISTINCT ord1.analysis_id,
-  'ERROR: ' + cast(ord1.analysis_id as string) + ' - ' + oa1.analysis_name + ' (count = ' + cast(count(ord1.min_value) as string) + '); min value should not be negative' AS ACHILLES_HEEL_warning,
+--SELECT DISTINCT ord1.analysis_id,
+SELECT  ord1.analysis_id,
+  concat('ERROR: ', cast(ord1.analysis_id as string), ' - ', oa1.analysis_name, ' (count = ', cast(count(ord1.min_value) as string), '); min value should not be negative') AS ACHILLES_HEEL_warning,
   2 as rule_id,
   count(ord1.min_value) as record_count
 FROM ACHILLES_results_dist ord1
@@ -156,7 +130,7 @@ WHERE ord1.analysis_id IN (
 		1608
 		)
 	AND ord1.min_value < 0
-	GROUP BY ord1.analysis_id,  oa1.analysis_name;
+GROUP BY ord1.analysis_id,  oa1.analysis_name;
 
 	
 --ruleid 3 death distributions where max should not be positive
@@ -166,8 +140,9 @@ INSERT INTO ACHILLES_HEEL_results (
 	rule_id,
 	record_count
 )
-SELECT DISTINCT ord1.analysis_id,
-  'WARNING: ' + cast(ord1.analysis_id as string) + '-' + oa1.analysis_name + ' (count = ' + cast(count(ord1.max_value) as string) + '); max value should not be positive, otherwise its a zombie with data >1mo after death ' AS ACHILLES_HEEL_warning,
+-- SELECT DISTINCT ord1.analysis_id,
+SELECT ord1.analysis_id,
+  concat('WARNING: ', cast(ord1.analysis_id as string), '-', oa1.analysis_name, ' (count = ', cast(count(ord1.max_value) as string), '); max value should not be positive, otherwise its a zombie with data >1mo after death ') AS ACHILLES_HEEL_warning,
   3 as rule_id,
   count(ord1.max_value) as record_count
 FROM ACHILLES_results_dist ord1
@@ -192,7 +167,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_1) AS string) + ' concepts in data are not in vocabulary' AS ACHILLES_HEEL_warning,
+	concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_1) AS string), ' concepts in data are not in vocabulary') AS ACHILLES_HEEL_warning,
   4 as rule_id,
   count(DISTINCT stratum_1) as record_count
 FROM ACHILLES_results or1
@@ -231,7 +206,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_2) AS string) + ' concepts in data are not in vocabulary' AS ACHILLES_HEEL_warning,
+	concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_2) AS string), ' concepts in data are not in vocabulary') AS ACHILLES_HEEL_warning,
   5 as rule_id,
   count(DISTINCT stratum_2) as record_count
 FROM ACHILLES_results or1
@@ -259,9 +234,9 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'WARNING: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; data with unmapped concepts' AS ACHILLES_HEEL_warning,
-  6 as rule_id,
-  null as record_count
+	concat('WARNING: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; data with unmapped concepts') AS ACHILLES_HEEL_warning,
+    6 as rule_id,
+    null as record_count
 FROM ACHILLES_results or1
 INNER JOIN ACHILLES_analysis oa1
 	ON or1.analysis_id = oa1.analysis_id
@@ -296,9 +271,9 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_1) AS string) + ' concepts in data are not in correct vocabulary' AS ACHILLES_HEEL_warning,
-  7 as rule_id,
-  count(DISTINCT stratum_1) as record_count
+	concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_1) AS string), ' concepts in data are not in correct vocabulary') AS ACHILLES_HEEL_warning,
+    7 as rule_id,
+    count(DISTINCT stratum_1) as record_count
 FROM ACHILLES_results or1
 INNER JOIN ACHILLES_analysis oa1
 	ON or1.analysis_id = oa1.analysis_id
@@ -320,7 +295,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_1) AS string) + ' concepts in data are not in correct vocabulary' AS ACHILLES_HEEL_warning,
+  concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_1) AS string), ' concepts in data are not in correct vocabulary') AS ACHILLES_HEEL_warning,
   8 as rule_id,
   count(DISTINCT stratum_1) as record_count
 FROM ACHILLES_results or1
@@ -344,9 +319,9 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_1) AS string) + ' concepts in data are not in correct vocabulary (CMS Ethnicity)' AS ACHILLES_HEEL_warning,
-  9 as rule_id,
-  count(DISTINCT stratum_1) as record_count
+	concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_1) AS string), ' concepts in data are not in correct vocabulary (CMS Ethnicity)') AS ACHILLES_HEEL_warning,
+    9 as rule_id,
+    count(DISTINCT stratum_1) as record_count
 FROM ACHILLES_results or1
 INNER JOIN ACHILLES_analysis oa1
 	ON or1.analysis_id = oa1.analysis_id
@@ -368,7 +343,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_1) AS string) + ' concepts in data are not in correct vocabulary' AS ACHILLES_HEEL_warning,
+  concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_1) AS string), ' concepts in data are not in correct vocabulary') AS ACHILLES_HEEL_warning,
   10 as rule_id,
   count(DISTINCT stratum_1) as record_count
 FROM ACHILLES_results or1
@@ -392,9 +367,9 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_1) AS string) + ' concepts in data are not in correct vocabulary (Specialty)' AS ACHILLES_HEEL_warning,
-  11 as rule_id,
-  count(DISTINCT stratum_1) as record_count
+	  concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_1) AS string), ' concepts in data are not in correct vocabulary (Specialty)') AS ACHILLES_HEEL_warning,
+	  11 as rule_id,
+	  count(DISTINCT stratum_1) as record_count
 FROM ACHILLES_results or1
 INNER JOIN ACHILLES_analysis oa1
 	ON or1.analysis_id = oa1.analysis_id
@@ -416,7 +391,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_1) AS string) + ' concepts in data are not in correct vocabulary' AS ACHILLES_HEEL_warning,
+  concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_1) AS string), ' concepts in data are not in correct vocabulary')AS ACHILLES_HEEL_warning,
   12 as rule_id,
   count(DISTINCT stratum_1) as record_count
 FROM ACHILLES_results or1
@@ -443,7 +418,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_1) AS string) + ' concepts in data are not in correct vocabulary' AS ACHILLES_HEEL_warning,
+	concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_1) AS string), ' concepts in data are not in correct vocabulary') AS ACHILLES_HEEL_warning,
   13 as rule_id,
   count(DISTINCT stratum_1) as record_count
 FROM ACHILLES_results or1
@@ -470,7 +445,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_1) AS string) + ' concepts in data are not in correct vocabulary' AS ACHILLES_HEEL_warning,
+   concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_1) AS string), ' concepts in data are not in correct vocabulary') AS ACHILLES_HEEL_warning,
   14 as rule_id,
   count(DISTINCT stratum_1) as record_count
 FROM ACHILLES_results or1
@@ -502,7 +477,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; ' + cast(count(DISTINCT stratum_1) AS string) + ' concepts in data are not in correct vocabulary (revenue code)' AS ACHILLES_HEEL_warning,
+   concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; ', cast(count(DISTINCT stratum_1) AS string), ' concepts in data are not in correct vocabulary (revenue code)') AS ACHILLES_HEEL_warning,
   17 as rule_id,
   count(DISTINCT stratum_1) as record_count
 FROM ACHILLES_results or1
@@ -525,15 +500,16 @@ INSERT INTO ACHILLES_HEEL_results (
 	rule_id,
 	record_count
 )
-SELECT DISTINCT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; should not have year of birth in the future, (n=' + cast(sum(or1.count_value) as string) + ')' AS ACHILLES_HEEL_warning,
+--SELECT DISTINCT or1.analysis_id,
+SELECT  or1.analysis_id,
+   concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; should not have year of birth in the future, (n=', cast(sum(or1.count_value) as string), ')') AS ACHILLES_HEEL_warning,
   18 as rule_id,
   sum(or1.count_value) as record_count
 FROM ACHILLES_results or1
 INNER JOIN ACHILLES_analysis oa1
 	ON or1.analysis_id = oa1.analysis_id
 WHERE or1.analysis_id IN (3)
-	AND CAST(or1.stratum_1 AS INT) > year(getdate())
+	AND CAST(or1.stratum_1 AS INT) > year(now())
 	AND or1.count_value > 0
 GROUP BY or1.analysis_id,
   oa1.analysis_name;
@@ -547,7 +523,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; should not have year of birth < 1800, (n=' + cast(sum(or1.count_value) as string) + ')' AS ACHILLES_HEEL_warning,
+   concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; should not have year of birth < 1800, (n=', cast(sum(or1.count_value) as string), ')') AS ACHILLES_HEEL_warning,
   19 as rule_id,
   sum(or1.count_value) as record_count
 FROM ACHILLES_results or1
@@ -568,7 +544,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; should not have age < 0, (n=' + cast(sum(or1.count_value) as string) + ')' AS ACHILLES_HEEL_warning,
+   concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; should not have age < 0, (n=', cast(sum(or1.count_value) as string), ')') AS ACHILLES_HEEL_warning,
   20 as rule_id,
   sum(or1.count_value) as record_count
 FROM ACHILLES_results or1
@@ -589,7 +565,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT or1.analysis_id,
-	'ERROR: ' + cast(or1.analysis_id as string) + '-' + oa1.analysis_name + '; should not have age > 150, (n=' + cast(sum(or1.count_value) as string) + ')' AS ACHILLES_HEEL_warning,
+   concat('ERROR: ', cast(or1.analysis_id as string), '-', oa1.analysis_name, '; should not have age > 150, (n=', cast(sum(or1.count_value) as string), ')') AS ACHILLES_HEEL_warning,
   21 as rule_id,
   sum(or1.count_value) as record_count
 FROM ACHILLES_results or1
@@ -609,8 +585,8 @@ INSERT INTO ACHILLES_HEEL_results (
 	rule_id
 )
 SELECT DISTINCT ar1.analysis_id,
-	'WARNING: ' + cast(ar1.analysis_id as string) + '-' + aa1.analysis_name + '; theres a 100% change in monthly count of events' AS ACHILLES_HEEL_warning,
-  22 as rule_id
+	concat('WARNING: ', cast(ar1.analysis_id as string), '-', aa1.analysis_name, '; theres a 100% change in monthly count of events') AS ACHILLES_HEEL_warning,
+    22 as rule_id
 FROM ACHILLES_analysis aa1
 INNER JOIN ACHILLES_results ar1
 	ON aa1.analysis_id = ar1.analysis_id
@@ -640,7 +616,7 @@ INSERT INTO ACHILLES_HEEL_results (
 	record_count
 )
 SELECT ar1.analysis_id,
-	'WARNING: ' + cast(ar1.analysis_id as string) + '-' + aa1.analysis_name + '; ' + cast(count(DISTINCT ar1.stratum_1) AS string) + ' concepts have a 100% change in monthly count of events' AS ACHILLES_HEEL_warning,
+	concat('WARNING: ', cast(ar1.analysis_id as string), '-', aa1.analysis_name, '; ', cast(count(DISTINCT ar1.stratum_1) AS string), ' concepts have a 100% change in monthly count of events') AS ACHILLES_HEEL_warning,
   23 as rule_id,
   count(DISTINCT ar1.stratum_1) as record_count
 FROM ACHILLES_analysis aa1
@@ -674,8 +650,9 @@ INSERT INTO ACHILLES_HEEL_results (
 	rule_id,
 	record_count
 )
-SELECT DISTINCT ord1.analysis_id,
-  'WARNING: ' + cast(ord1.analysis_id as string) + '-' + oa1.analysis_name + ' (count = ' + cast(count(ord1.max_value) as string) + '); max value should not be > 180' AS ACHILLES_HEEL_warning,
+-- SELECT DISTINCT ord1.analysis_id,
+SELECT  ord1.analysis_id,
+  concat('WARNING: ', cast(ord1.analysis_id as string), '-', oa1.analysis_name, ' (count = ', cast(count(ord1.max_value) as string), '); max value should not be > 180') AS ACHILLES_HEEL_warning,
   24 as rule_id,
   count(ord1.max_value) as record_count
 FROM ACHILLES_results_dist ord1
@@ -693,8 +670,9 @@ INSERT INTO ACHILLES_HEEL_results (
 	rule_id,
 	record_count
 )
-SELECT DISTINCT ord1.analysis_id,
-  'WARNING: ' + cast(ord1.analysis_id as string) + '-' + oa1.analysis_name + ' (count = ' + cast(count(ord1.max_value) as string) + '); max value should not be > 10' AS ACHILLES_HEEL_warning,
+-- SELECT DISTINCT ord1.analysis_id,
+SELECT ord1.analysis_id,
+  concat('WARNING: ', cast(ord1.analysis_id as string), '-', oa1.analysis_name, ' (count = ', cast(count(ord1.max_value) as string), '); max value should not be > 10') AS ACHILLES_HEEL_warning,
   25 as rule_id,
   count(ord1.max_value) as record_count
 FROM ACHILLES_results_dist ord1
@@ -712,8 +690,9 @@ INSERT INTO ACHILLES_HEEL_results (
 	rule_id,
 	record_count
 )
-SELECT DISTINCT ord1.analysis_id,
-  'WARNING: ' + cast(ord1.analysis_id as string) + '-' + oa1.analysis_name + ' (count = ' + cast(count(ord1.max_value) as string) + '); max value should not be > 600' AS ACHILLES_HEEL_warning,
+-- SELECT DISTINCT ord1.analysis_id,
+SELECT ord1.analysis_id,
+  concat('WARNING: ', cast(ord1.analysis_id as string), '-', oa1.analysis_name, ' (count = ', cast(count(ord1.max_value) as string), '); max value should not be > 600') AS ACHILLES_HEEL_warning,
   26 as rule_id,
   count(ord1.max_value) as record_count
 FROM ACHILLES_results_dist ord1

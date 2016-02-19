@@ -47,10 +47,9 @@ create table ACHILLES_results_dist
 	p90_value float
 ) stored as parquet;
 
+
 /********************************************
-
 ACHILLES Analyses on PERSON table
-
 *********************************************/
  
 -- 5	Number of persons by ethnicity
@@ -58,7 +57,6 @@ insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 5 as analysis_id,  ETHNICITY_CONCEPT_ID as stratum_1, count(distinct person_id) as count_value
 from PERSON
 group by ETHNICITY_CONCEPT_ID;
-
 
 -- 7	Number of persons with invalid provider_id
 insert into ACHILLES_results (analysis_id, count_value)
@@ -80,7 +78,6 @@ where p1.location_id is not null
 	and l1.location_id is null
 ;
 
-
 -- 9	Number of persons with invalid care_site_id
 insert into ACHILLES_results (analysis_id, count_value)
 select 9 as analysis_id,  count(p1.person_id) as count_value
@@ -90,7 +87,6 @@ from PERSON p1
 where p1.care_site_id is not null
 	and cs1.care_site_id is null
 ;
-
 
 
 /********************************************

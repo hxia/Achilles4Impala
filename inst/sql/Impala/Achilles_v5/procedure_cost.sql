@@ -3,20 +3,18 @@
    ACHILLES Analyses on PROCEDURE_COST table
 *********************************************/
 
--- { 1602 in (@list_of_analysis_ids) | 1603 in (@list_of_analysis_ids) | 1604 in (@list_of_analysis_ids) | 1605 in (@list_of_analysis_ids) | 1606 in (@list_of_analysis_ids) | 1607 in (@list_of_analysis_ids) | 1608 in (@list_of_analysis_ids)}?{
-
-CREATE TABLE ACHILLES_procedure_cost_raw as
-select procedure_concept_id as subject_id,
-  paid_copay,
-  paid_coinsurance,
-   paid_toward_deductible,
-   paid_by_payer,
-   paid_by_coordination_benefits, 
-   total_out_of_pocket,
-   total_paid
-from procedure_cost pc1
-join procedure_occurrence po1 on pc1.procedure_occurrence_id = po1.procedure_occurrence_id and procedure_concept_id <> 0
-;
+-- CREATE TABLE ACHILLES_procedure_cost_raw as
+-- select procedure_concept_id as po1.procedure_concept_id,
+  -- paid_copay,
+  -- paid_coinsurance,
+   -- paid_toward_deductible,
+   -- paid_by_payer,
+   -- paid_by_coordination_benefits, 
+   -- total_out_of_pocket,
+   -- total_paid
+-- from procedure_cost pc1
+-- join procedure_occurrence po1 on pc1.procedure_occurrence_id = po1.procedure_occurrence_id and procedure_concept_id <> 0
+-- ;
 
 
 -- 1600   Number of procedure cost records with invalid procedure exposure id
@@ -48,10 +46,12 @@ where pc1.payer_plan_period_id is not null
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    paid_copay as count_value
-  from ACHILLES_procedure_cost_raw
-  where paid_copay is not null
+  select po1.procedure_concept_id as stratum1_id,
+    pc1.paid_copay as count_value
+  from procedure_cost pc1
+	join procedure_occurrence po1 
+		on pc1.procedure_occurrence_id = po1.procedure_occurrence_id and po1.procedure_concept_id <> 0
+  where pc1.paid_copay is not null
 ),
 overallStats as
 (
@@ -102,10 +102,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    paid_coinsurance as count_value
-  from ACHILLES_procedure_cost_raw
-  where paid_coinsurance is not null
+  select po1.procedure_concept_id as stratum1_id,
+    pc1.paid_coinsurance as count_value
+  from procedure_cost pc1
+	join procedure_occurrence po1 
+		on pc1.procedure_occurrence_id = po1.procedure_occurrence_id and po1.procedure_concept_id <> 0
+  where pc1.paid_coinsurance is not null
 ),
 overallStats as
 (
@@ -156,10 +158,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    paid_toward_deductible as count_value
-  from ACHILLES_procedure_cost_raw
-  where paid_toward_deductible is not null
+  select po1.procedure_concept_id as stratum1_id,
+    pc1.paid_toward_deductible as count_value
+  from procedure_cost pc1
+	join procedure_occurrence po1 
+		on pc1.procedure_occurrence_id = po1.procedure_occurrence_id and po1.procedure_concept_id <> 0
+  where pc1.paid_toward_deductible is not null
 ),
 overallStats as
 (
@@ -210,10 +214,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    paid_by_payer as count_value
-  from ACHILLES_procedure_cost_raw
-  where paid_by_payer is not null
+  select po1.procedure_concept_id as stratum1_id,
+    pc1.paid_by_payer as count_value
+  from procedure_cost pc1
+	join procedure_occurrence po1 
+		on pc1.procedure_occurrence_id = po1.procedure_occurrence_id and po1.procedure_concept_id <> 0
+  where pc1.paid_by_payer is not null
 ),
 overallStats as
 (
@@ -264,10 +270,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    paid_by_coordination_benefits as count_value
-  from ACHILLES_procedure_cost_raw
-  where paid_by_coordination_benefits is not null
+  select po1.procedure_concept_id as stratum1_id,
+    pc1.paid_by_coordination_benefits as count_value
+  from procedure_cost pc1
+	join procedure_occurrence po1 
+		on pc1.procedure_occurrence_id = po1.procedure_occurrence_id and po1.procedure_concept_id <> 0
+  where pc1.paid_by_coordination_benefits is not null
 ),
 overallStats as
 (
@@ -318,10 +326,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    total_out_of_pocket as count_value
-  from ACHILLES_procedure_cost_raw
-  where total_out_of_pocket is not null
+  select po1.procedure_concept_id as stratum1_id,
+    pc1.total_out_of_pocket as count_value
+  from procedure_cost pc1
+	join procedure_occurrence po1 
+		on pc1.procedure_occurrence_id = po1.procedure_occurrence_id and po1.procedure_concept_id <> 0
+  where pc1.total_out_of_pocket is not null
 ),
 overallStats as
 (
@@ -372,10 +382,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    total_paid as count_value
-  from ACHILLES_procedure_cost_raw
-  where total_paid is not null
+  select po1.procedure_concept_id as stratum1_id,
+    pc1.total_paid as count_value
+  from procedure_cost pc1
+	join procedure_occurrence po1 
+		on pc1.procedure_occurrence_id = po1.procedure_occurrence_id and po1.procedure_concept_id <> 0
+  where pc1.total_paid is not null
 ),
 overallStats as
 (
@@ -423,7 +435,6 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 
 
 -- 1609   Number of records by disease_class_concept_id
-
 --not applicable for OMOP CDMv5
 
 
@@ -438,5 +449,7 @@ group by revenue_code_concept_id
 ;
 
 -- clean up cached table if exists
-DROP TABLE ACHILLES_procedure_cost_raw;
+-- DROP TABLE ACHILLES_procedure_cost_raw;
+
+exit;
 

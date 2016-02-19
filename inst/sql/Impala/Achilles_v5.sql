@@ -753,7 +753,6 @@ group by vo1.visit_concept_id,
 ;
 
 -- 203	Number of distinct visit occurrence concepts per person
-
 with rawData(person_id, count_value) as
 (
     select vo1.person_id, count(distinct vo1.visit_concept_id) as count_value

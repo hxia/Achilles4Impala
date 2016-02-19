@@ -1,5 +1,4 @@
 
-
 /********************************************
   ACHILLES Analyses on MEASUREMENT table
 *********************************************/
@@ -13,7 +12,6 @@ from measurement m
 group by m.measurement_CONCEPT_ID
 ;
 
-
 -- 1801   Number of measurement occurrence records, by measurement_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 1801 as analysis_id, 
@@ -22,7 +20,6 @@ select 1801 as analysis_id,
 from measurement m
 group by m.measurement_CONCEPT_ID
 ;
-
 
 -- 1802   Number of persons by measurement occurrence start month, by measurement_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
@@ -34,7 +31,6 @@ from measurement m
 group by m.measurement_concept_id, 
    YEAR(cast(measurement_date as timestamp))*100 + month(cast(measurement_date as timestamp))
 ;
-
 
 -- 1803   Number of distinct measurement occurrence concepts per person
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -89,7 +85,6 @@ cross join overallStats o
 group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 1804   Number of persons with at least one measurement occurrence, by measurement_concept_id by calendar year by gender by age decile
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, stratum_3, stratum_4, count_value)
 select 1804 as analysis_id,   
@@ -106,7 +101,6 @@ group by m.measurement_concept_id,
    floor((year(cast(measurement_date as timestamp)) - p1.year_of_birth)/10)
 ;
 
-
 -- 1805   Number of measurement records, by measurement_concept_id by measurement_type_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
 select 1805 as analysis_id, 
@@ -117,7 +111,6 @@ from measurement m
 group by m.measurement_concept_id,   
    m.measurement_type_concept_id
 ;
-
 
 -- 1806   Distribution of age by measurement_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, stratum_2, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -178,7 +171,6 @@ join overallStats o on p.stratum1_id = o.stratum1_id and p.stratum2_id = o.strat
 group by o.stratum1_id, o.stratum2_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 1807   Number of measurement occurrence records, by measurement_concept_id and unit_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
 select 1807 as analysis_id, 
@@ -189,7 +181,6 @@ from measurement m
 group by m.measurement_concept_id, m.unit_concept_id
 ;
 
-
 -- 1809   Number of measurement records with invalid person_id
 insert into ACHILLES_results (analysis_id, count_value)
 select 1809 as analysis_id,  
@@ -198,7 +189,6 @@ from measurement m
    left join PERSON p1 on p1.person_id = m.person_id
 where p1.person_id is null
 ;
-
 
 -- 1810   Number of measurement records outside valid observation period
 insert into ACHILLES_results (analysis_id, count_value)
@@ -210,7 +200,6 @@ from measurement m
    and cast(m.measurement_date as timestamp) <= cast(op.observation_period_end_date as timestamp)
 where op.person_id is null
 ;
-
 
 -- 1812   Number of measurement records with invalid provider_id
 insert into ACHILLES_results (analysis_id, count_value)
@@ -232,7 +221,6 @@ where m.visit_occurrence_id is not null
    and vo.visit_occurrence_id is null
 ;
 
-
 -- 1814   Number of measurement records with no value (numeric or concept)
 insert into ACHILLES_results (analysis_id, count_value)
 select 814 as analysis_id,  
@@ -241,7 +229,6 @@ from measurement m
 where m.value_as_number is null
    and m.value_as_concept_id is null
 ;
-
 
 -- 1815  Distribution of numeric values, by measurement_concept_id and unit_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, stratum_2, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -294,7 +281,6 @@ from priorStats p
 join overallStats o on p.stratum1_id = o.stratum1_id and p.stratum2_id = o.stratum2_id 
 group by o.stratum1_id, o.stratum2_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
-
 
 -- 1816   Distribution of low range, by measurement_concept_id and unit_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, stratum_2, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -352,7 +338,6 @@ join overallStats o on p.stratum1_id = o.stratum1_id and p.stratum2_id = o.strat
 group by o.stratum1_id, o.stratum2_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 1817   Distribution of high range, by observation_concept_id and unit_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, stratum_2, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
@@ -409,7 +394,6 @@ join overallStats o on p.stratum1_id = o.stratum1_id and p.stratum2_id = o.strat
 group by o.stratum1_id, o.stratum2_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 1818   Number of observation records below/within/above normal range, by observation_concept_id and unit_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, stratum_3, count_value)
 select 1818 as analysis_id,  
@@ -433,7 +417,6 @@ group by measurement_concept_id,
       else 'Other' end
 ;
 
-
 -- 1820   Number of observation records by condition occurrence start month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 1820 as analysis_id,   
@@ -442,3 +425,5 @@ select 1820 as analysis_id,
 from measurement m
 group by YEAR(cast(measurement_date as timestamp))*100 + month(cast(measurement_date as timestamp))
 ;
+
+exit;

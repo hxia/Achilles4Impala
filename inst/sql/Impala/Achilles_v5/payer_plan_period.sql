@@ -64,7 +64,6 @@ join overallStats o on p.stratum1_id = o.stratum1_id
 group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 1407   Length of payer plan (days) of first payer plan period by age decile
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
@@ -123,7 +122,6 @@ join overallStats o on p.stratum_id = o.stratum_id
 group by o.stratum_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 1408   Number of persons by length of payer plan period, in 30d increments
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 1408 as analysis_id,  
@@ -142,7 +140,6 @@ from PERSON p1
 group by floor(DATEDIFF(cast(ppp1.payer_plan_period_end_date as timestamp), cast(ppp1.payer_plan_period_start_date as timestamp))/30)
 ;
 
-
 -- 1409   Number of persons with continuous payer plan in each year
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 with rawData as 
@@ -159,7 +156,6 @@ where year(cast(ppp1.payer_plan_period_START_DATE as timestamp)) <= t1.obs_year
    and year(cast(ppp1.payer_plan_period_END_DATE as timestamp)) >= t1.obs_year
 group by t1.obs_year
 ;
-
 
 -- 1410   Number of persons with continuous payer plan in each month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
@@ -188,7 +184,6 @@ where cast(ppp1.payer_plan_period_START_DATE as timestamp) <= obs_month_start
 group by obs_month
 ;
 
-
 -- 1411   Number of persons by payer plan period start month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 1411 as analysis_id, 
@@ -199,7 +194,6 @@ from PERSON p1
    on p1.person_id = ppp1.person_id
 group by concat_ws('-', cast(YEAR(cast(payer_plan_period_start_date as timestamp)) as string), lpad(CAST(month(cast(payer_plan_period_START_DATE as timestamp)) as string), 2, '0'), '01') 
 ;
-
 
 -- 1412   Number of persons by payer plan period end month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
@@ -212,7 +206,6 @@ from PERSON p1
 group by concat_ws('-', cast(YEAR(cast(payer_plan_period_end_date as timestamp)) as string), lpad(cast(month(cast(payer_plan_period_end_DATE as timestamp)) as string), 2, '0'), '01')
 ;
 
-
 -- 1413   Number of persons by number of payer plan periods
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 1413 as analysis_id,  
@@ -224,7 +217,6 @@ from PERSON p1
 group by ppp1.num_periods
 ;
 
-
 -- 1414   Number of persons with payer plan period before year-of-birth
 insert into ACHILLES_results (analysis_id, count_value)
 select 1414 as analysis_id,  
@@ -235,7 +227,6 @@ from PERSON p1
 where p1.year_of_birth > ppp1.first_obs_year
 ;
 
-
 -- 1415   Number of persons with payer plan period end < start
 insert into ACHILLES_results (analysis_id, count_value)
 select 1415 as analysis_id,  
@@ -245,3 +236,4 @@ from
 where cast(ppp1.payer_plan_period_end_date as timestamp) < cast(ppp1.payer_plan_period_start_date as timestamp)
 ;
 
+exit;

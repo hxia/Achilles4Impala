@@ -1,29 +1,27 @@
 
-
 /********************************************
 ACHILLES Analyses on DRUG_EXPOSURE table
 *********************************************/
 
 -- create raw data table based on DRUG_EXPOSURE for better performance
-create table drug_exposure_raw as
-select person_id, gender_concept_id, drug_concept_id, year_of_birth, syear, smonth, sday, 
-	cast(concat_ws('-', cast(syear as string), lpad(cast(smonth as string), 2, '0'), lpad(cast(sday as string), 2, '0')) as timestamp) as sdate,
-	eyear, emonth, eday, 
-	cast(concat_ws('-', cast(eyear as string), lpad(cast(emonth as string), 2, '0'), lpad(cast(eday as string), 2, '0')) as timestamp) as edate
-from 
- (
-	select p.person_id, p.gender_concept_id, op.drug_concept_id,
-	   cast(p.YEAR_OF_BIRTH as int) as year_of_birth, 
-	   cast(regexp_extract(drug_exposure_start_date, '/(\\d+)$', 1) as int) as syear,
-	   cast(regexp_extract(drug_exposure_start_date, '^(\\d+)/', 1) as int) as smonth,
-	   cast(regexp_extract(drug_exposure_start_date, '/(\\d+)/', 1) as int) as sday,
-	   cast(regexp_extract(drug_exposure_end_date, '/(\\d+)$', 1) as int) as eyear,
-	   cast(regexp_extract(drug_exposure_end_date, '^(\\d+)/', 1) as int) as emonth,
-	   cast(regexp_extract(drug_exposure_end_date, '/(\\d+)/', 1) as int) as eday
-	from PERSON p join drug_exposure op on p.person_id = op.person_id
- ) t
-;
-
+-- create table drug_exposure_raw as
+-- select person_id, gender_concept_id, drug_concept_id, year_of_birth, syear, smonth, sday, 
+	-- cast(concat_ws('-', cast(syear as string), lpad(cast(smonth as string), 2, '0'), lpad(cast(sday as string), 2, '0')) as timestamp) as sdate,
+	-- eyear, emonth, eday, 
+	-- cast(concat_ws('-', cast(eyear as string), lpad(cast(emonth as string), 2, '0'), lpad(cast(eday as string), 2, '0')) as timestamp) as edate
+-- from 
+ -- (
+	-- select p.person_id, p.gender_concept_id, op.drug_concept_id,
+	   -- cast(p.YEAR_OF_BIRTH as int) as year_of_birth, 
+	   -- cast(regexp_extract(drug_exposure_start_date, '/(\\d+)$', 1) as int) as syear,
+	   -- cast(regexp_extract(drug_exposure_start_date, '^(\\d+)/', 1) as int) as smonth,
+	   -- cast(regexp_extract(drug_exposure_start_date, '/(\\d+)/', 1) as int) as sday,
+	   -- cast(regexp_extract(drug_exposure_end_date, '/(\\d+)$', 1) as int) as eyear,
+	   -- cast(regexp_extract(drug_exposure_end_date, '^(\\d+)/', 1) as int) as emonth,
+	   -- cast(regexp_extract(drug_exposure_end_date, '/(\\d+)/', 1) as int) as eday
+	-- from PERSON p join drug_exposure op on p.person_id = op.person_id
+ -- ) t
+-- ;
 
 -- 700   Number of persons with at least one drug occurrence, by drug_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
@@ -34,7 +32,6 @@ from drug_exposure de1
 group by de1.drug_CONCEPT_ID
 ;
 
-
 -- 701   Number of drug occurrence records, by drug_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 701 as analysis_id, 
@@ -43,7 +40,6 @@ select 701 as analysis_id,
 from drug_exposure de1
 group by de1.drug_CONCEPT_ID
 ;
-
 
 -- 702   Number of persons by drug occurrence start month, by drug_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
@@ -55,7 +51,6 @@ from drug_exposure de1
 group by de1.drug_concept_id, 
    YEAR(cast(drug_exposure_start_date as timestamp))*100 + month(cast(drug_exposure_start_date as timestamp))
 ;
-
 
 -- 703   Number of distinct drug exposure concepts per person
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -109,7 +104,6 @@ cross join overallStats o
 group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 704   Number of persons with at least one drug occurrence, by drug_concept_id by calendar year by gender by age decile
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, stratum_3, stratum_4, count_value)
 select 704 as analysis_id,   
@@ -126,7 +120,6 @@ group by de1.drug_concept_id,
    floor((year(cast(drug_exposure_start_date as timestamp)) - p1.year_of_birth)/10)
 ;
 
-
 -- 705   Number of drug occurrence records, by drug_concept_id by drug_type_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
 select 705 as analysis_id, 
@@ -136,7 +129,6 @@ select 705 as analysis_id,
 from drug_exposure de1
 group by de1.drug_CONCEPT_ID, de1.drug_type_concept_id
 ;
-
 
 -- 706   Distribution of age by drug_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, stratum_2, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -195,7 +187,6 @@ join overallStats o on p.stratum1_id = o.stratum1_id and p.stratum2_id = o.strat
 group by o.stratum1_id, o.stratum2_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 709   Number of drug exposure records with invalid person_id
 insert into ACHILLES_results (analysis_id, count_value)
 select 709 as analysis_id,  
@@ -204,7 +195,6 @@ from drug_exposure de1
    left join PERSON p1 on p1.person_id = de1.person_id
 where p1.person_id is null
 ;
-
 
 -- 710   Number of drug exposure records outside valid observation period
 insert into ACHILLES_results (analysis_id, count_value)
@@ -218,7 +208,6 @@ from drug_exposure de1
 where op1.person_id is null
 ;
 
-
 -- 711   Number of drug exposure records with end date < start date
 insert into ACHILLES_results (analysis_id, count_value)
 select 711 as analysis_id,  
@@ -226,7 +215,6 @@ select 711 as analysis_id,
 from drug_exposure de1
 where cast(de1.drug_exposure_end_date as string) < cast(de1.drug_exposure_start_date as string)
 ;
-
 
 -- 712   Number of drug exposure records with invalid provider_id
 insert into ACHILLES_results (analysis_id, count_value)
@@ -238,7 +226,6 @@ where de1.provider_id is not null
    and p1.provider_id is null
 ;
 
-
 -- 713   Number of drug exposure records with invalid visit_id
 insert into ACHILLES_results (analysis_id, count_value)
 select 713 as analysis_id,  
@@ -247,7 +234,6 @@ from drug_exposure de1
    left join visit_occurrence vo1 on de1.visit_occurrence_id = vo1.visit_occurrence_id
 where de1.visit_occurrence_id is not null and vo1.visit_occurrence_id is null
 ;
-
 
 -- 715   Distribution of days_supply by drug_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -299,7 +285,6 @@ join overallStats o on p.stratum_id = o.stratum_id
 group by o.stratum_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 716   Distribution of refills by drug_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
@@ -350,7 +335,6 @@ join overallStats o on p.stratum_id = o.stratum_id
 group by o.stratum_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 717   Distribution of quantity by drug_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
@@ -400,7 +384,6 @@ join overallStats o on p.stratum_id = o.stratum_id
 group by o.stratum_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 720   Number of drug exposure records by condition occurrence start month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 720 as analysis_id,   
@@ -410,3 +393,4 @@ from drug_exposure de1
 group by YEAR(cast(drug_exposure_start_date as timestamp))*100 + month(cast(drug_exposure_start_date as timestamp))
 ;
 
+exit;

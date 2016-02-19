@@ -4,24 +4,21 @@
 *********************************************/
 
 -- for performance optimization, we create a table with drug costs pre-cached for the 15XX analysis
-
--- { 1502 in (@list_of_analysis_ids) | 1503 in (@list_of_analysis_ids) | 1504 in (@list_of_analysis_ids) | 1505 in (@list_of_analysis_ids) | 1506 in (@list_of_analysis_ids) | 1507 in (@list_of_analysis_ids) | 1508 in (@list_of_analysis_ids) | 1509 in (@list_of_analysis_ids) | 1510 in (@list_of_analysis_ids) | 1511 in (@list_of_analysis_ids)}?{
-
-create table ACHILLES_drug_cost_raw as
-select drug_concept_id as subject_id,
-  paid_copay,
-   paid_coinsurance,
-   paid_toward_deductible,
-   paid_by_payer,
-   paid_by_coordination_benefits, 
-   total_out_of_pocket,
-   total_paid,
-   ingredient_cost,
-   dispensing_fee,
-   average_wholesale_price
-from drug_cost dc1
-join drug_exposure de1 on de1.drug_exposure_id = dc1.drug_exposure_id and drug_concept_id <> 0
-;
+-- create table ACHILLES_drug_cost_raw as
+-- select drug_concept_id as subject_id,
+  -- paid_copay,
+   -- paid_coinsurance,
+   -- paid_toward_deductible,
+   -- paid_by_payer,
+   -- paid_by_coordination_benefits, 
+   -- total_out_of_pocket,
+   -- total_paid,
+   -- ingredient_cost,
+   -- dispensing_fee,
+   -- average_wholesale_price
+-- from drug_cost dc1
+-- join drug_exposure de1 on de1.drug_exposure_id = dc1.drug_exposure_id and drug_concept_id <> 0
+-- ;
 
 
 -- 1500   Number of drug cost records with invalid drug exposure id
@@ -51,10 +48,11 @@ where dc1.payer_plan_period_id is not null
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    paid_copay as count_value
-  from ACHILLES_drug_cost_raw
-  where paid_copay is not null
+  select de1.drug_concept_id as stratum1_id,
+    dc1.paid_copay as count_value
+  from drug_cost dc1
+	join drug_exposure de1 on de1.drug_exposure_id = dc1.drug_exposure_id and de1.drug_concept_id <> 0
+  where dc1.paid_copay is not null
 ),
 overallStats as
 (
@@ -105,10 +103,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    paid_coinsurance as count_value
-  from ACHILLES_drug_cost_raw
-  where paid_coinsurance is not null
+  select de1.drug_concept_id as stratum1_id,
+    dc1.paid_coinsurance as count_value
+  from drug_cost dc1
+	join drug_exposure de1 
+		on de1.drug_exposure_id = dc1.drug_exposure_id and de1.drug_concept_id <> 0
+  where dc1.paid_coinsurance is not null
 ),
 overallStats as
 (
@@ -159,10 +159,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    paid_toward_deductible as count_value
-  from ACHILLES_drug_cost_raw
-  where paid_toward_deductible is not null
+  select de1.drug_concept_id as stratum1_id,
+    dc1.paid_toward_deductible as count_value
+  from drug_cost dc1
+	join drug_exposure de1 
+		on de1.drug_exposure_id = dc1.drug_exposure_id and de1.drug_concept_id <> 0
+  where dc1.paid_toward_deductible is not null
 ),
 overallStats as
 (
@@ -213,10 +215,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    paid_by_payer as count_value
-  from ACHILLES_drug_cost_raw
-  where paid_by_payer is not null
+  select de1.drug_concept_id as stratum1_id,
+    dc1.paid_by_payer as count_value
+  from drug_cost dc1
+	join drug_exposure de1 
+		on de1.drug_exposure_id = dc1.drug_exposure_id and de1.drug_concept_id <> 0
+  where dc1.paid_by_payer is not null
 ),
 overallStats as
 (
@@ -267,10 +271,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    paid_by_coordination_benefits as count_value
-  from ACHILLES_drug_cost_raw
-  where paid_by_coordination_benefits is not null
+  select de1.drug_concept_id as stratum1_id,
+    dc1.paid_by_coordination_benefits as count_value
+  from drug_cost dc1
+	join drug_exposure de1 
+		on de1.drug_exposure_id = dc1.drug_exposure_id and de1.drug_concept_id <> 0
+  where dc1.paid_by_coordination_benefits is not null
 ),
 overallStats as
 (
@@ -321,10 +327,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    total_out_of_pocket as count_value
-  from ACHILLES_drug_cost_raw
-  where total_out_of_pocket is not null
+  select de1.drug_concept_id as stratum1_id,
+    dc1.total_out_of_pocket as count_value
+  from drug_cost dc1
+	join drug_exposure de1 
+		on de1.drug_exposure_id = dc1.drug_exposure_id and de1.drug_concept_id <> 0
+  where dc1.total_out_of_pocket is not null
 ),
 overallStats as
 (
@@ -375,10 +383,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    total_paid as count_value
-  from ACHILLES_drug_cost_raw
-  where total_paid is not null
+  select de1.drug_concept_id as stratum1_id,
+    dc1.total_paid as count_value
+  from drug_cost dc1
+	join drug_exposure de1 
+		on de1.drug_exposure_id = dc1.drug_exposure_id and de1.drug_concept_id <> 0
+  where dc1.total_paid is not null
 ),
 overallStats as
 (
@@ -429,10 +439,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    ingredient_cost as count_value
-  from ACHILLES_drug_cost_raw
-  where ingredient_cost is not null
+  select de1.drug_concept_id as stratum1_id,
+    dc1.ingredient_cost as count_value
+  from drug_cost dc1
+	join drug_exposure de1 
+		on de1.drug_exposure_id = dc1.drug_exposure_id and de1.drug_concept_id <> 0
+  where dc1.ingredient_cost is not null
 ),
 overallStats as
 (
@@ -483,10 +495,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    dispensing_fee as count_value
-  from ACHILLES_drug_cost_raw
-  where dispensing_fee is not null
+  select de1.drug_concept_id as stratum1_id,
+    dc1.dispensing_fee as count_value
+  from drug_cost dc1
+	join drug_exposure de1 
+		on de1.drug_exposure_id = dc1.drug_exposure_id and de1.drug_concept_id <> 0
+  where dc1.dispensing_fee is not null
 ),
 overallStats as
 (
@@ -537,10 +551,12 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select subject_id as stratum1_id,
-    average_wholesale_price as count_value
-  from ACHILLES_drug_cost_raw
-  where average_wholesale_price is not null
+  select de1.drug_concept_id as stratum1_id,
+    dc1.average_wholesale_price as count_value
+  from drug_cost dc1
+	join drug_exposure de1 
+		on de1.drug_exposure_id = dc1.drug_exposure_id and dc1.drug_concept_id <> 0
+  where dc1.average_wholesale_price is not null
 ),
 overallStats as
 (
@@ -587,5 +603,6 @@ group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_
 ;
 
 
-DROP TABLE ACHILLES_drug_cost_raw;
+-- DROP TABLE ACHILLES_drug_cost_raw;
 
+exit;

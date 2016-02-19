@@ -23,7 +23,6 @@ ACHILLES Analyses on PROCEDURE_OCCURRENCE table
  -- ) t
 -- ;
 
-
 -- 600   Number of persons with at least one procedure occurrence, by procedure_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 600 as analysis_id, 
@@ -32,7 +31,6 @@ select 600 as analysis_id,
 from procedure_occurrence po1
 group by po1.procedure_CONCEPT_ID
 ;
-
 
 -- 601   Number of procedure occurrence records, by procedure_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
@@ -43,7 +41,6 @@ from procedure_occurrence po1
 group by po1.procedure_CONCEPT_ID
 ;
 
-
 -- 602   Number of persons by procedure occurrence start month, by procedure_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
 select 602 as analysis_id,   
@@ -53,7 +50,6 @@ select 602 as analysis_id,
 from procedure_occurrence po1
 group by po1.procedure_concept_id, YEAR(cast(procedure_date as timestamp))*100 + month(cast(procedure_date as timestamp))
 ;
-
 
 -- 603   Number of distinct procedure occurrence concepts per person
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -103,7 +99,6 @@ cross join overallStats o
 group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 604   Number of persons with at least one procedure occurrence, by procedure_concept_id by calendar year by gender by age decile
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, stratum_3, stratum_4, count_value)
 select 604 as analysis_id,   
@@ -120,7 +115,6 @@ group by po1.procedure_concept_id,
    floor((year(cast(procedure_date as timestamp)) - p1.year_of_birth)/10)
 ;
 
-
 -- 605   Number of procedure occurrence records, by procedure_concept_id by procedure_type_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
 select 605 as analysis_id, 
@@ -130,7 +124,6 @@ select 605 as analysis_id,
 from procedure_occurrence po1
 group by po1.procedure_CONCEPT_ID, po1.procedure_type_concept_id
 ;
-
 
 -- 606   Distribution of age by procedure_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, stratum_2, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -190,7 +183,6 @@ join overallStats o on p.stratum1_id = o.stratum1_id and p.stratum2_id = o.strat
 group by o.stratum1_id, o.stratum2_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 609   Number of procedure occurrence records with invalid person_id
 insert into ACHILLES_results (analysis_id, count_value)
 select 609 as analysis_id,  
@@ -199,7 +191,6 @@ from procedure_occurrence po1
    left join PERSON p1 on p1.person_id = po1.person_id
 where p1.person_id is null
 ;
-
 
 -- 610   Number of procedure occurrence records outside valid observation period
 insert into ACHILLES_results (analysis_id, count_value)
@@ -213,7 +204,6 @@ from procedure_occurrence po1
 where op1.person_id is null
 ;
 
-
 -- 612   Number of procedure occurrence records with invalid provider_id
 insert into ACHILLES_results (analysis_id, count_value)
 select 612 as analysis_id,  
@@ -222,7 +212,6 @@ from procedure_occurrence po1
    left join provider p1 on p1.provider_id = po1.provider_id
 where po1.provider_id is not null and p1.provider_id is null
 ;
-
 
 -- 613   Number of procedure occurrence records with invalid visit_id
 insert into ACHILLES_results (analysis_id, count_value)
@@ -233,7 +222,6 @@ from procedure_occurrence po1
 where po1.visit_occurrence_id is not null and vo1.visit_occurrence_id is null
 ;
 
-
 -- 620   Number of procedure occurrence records by condition occurrence start month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 620 as analysis_id,   
@@ -242,3 +230,5 @@ select 620 as analysis_id,
 from procedure_occurrence po1
 group by YEAR(cast(procedure_date as timestamp))*100 + month(cast(procedure_date as timestamp))
 ;
+
+exit;

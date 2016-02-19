@@ -12,11 +12,12 @@ from cohort c1
 group by cohort_definition_id
 ;
 
-
 -- 1701   Number of records with cohort end date < cohort start date
 insert into ACHILLES_results (analysis_id, count_value)
 select 1701 as analysis_id, 
    count(subject_ID) as count_value
 from cohort c1
-where cast(c1.cohort_end_date  as timestamp) < cast(c1.cohort_start_date as timestamp)
+where cast(c1.cohort_end_date as timestamp) < cast(c1.cohort_start_date as timestamp)
 ;
+
+exit;

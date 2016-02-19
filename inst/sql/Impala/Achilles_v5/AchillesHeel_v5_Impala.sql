@@ -77,8 +77,8 @@ WHERE or1.analysis_id IN (
 		1601,
 		1701
 		) --all explicit counts of data anamolies
-	AND or1.count_value > 0;
-
+	AND or1.count_value > 0
+;
 	
 --ruleid 2 distributions where min should not be negative
 INSERT INTO ACHILLES_HEEL_results (
@@ -130,8 +130,8 @@ WHERE ord1.analysis_id IN (
 		1608
 		)
 	AND ord1.min_value < 0
-GROUP BY ord1.analysis_id,  oa1.analysis_name;
-
+GROUP BY ord1.analysis_id,  oa1.analysis_name
+;
 	
 --ruleid 3 death distributions where max should not be positive
 INSERT INTO ACHILLES_HEEL_results (
@@ -195,8 +195,8 @@ WHERE or1.analysis_id IN (
 	AND or1.stratum_1 IS NOT NULL
 	AND c1.concept_id IS NULL
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
-
+	oa1.analysis_name
+;
 	
 --ruleid 5 invalid type concept_id
 INSERT INTO ACHILLES_HEEL_results (
@@ -223,9 +223,9 @@ WHERE or1.analysis_id IN (
 	AND or1.stratum_2 IS NOT NULL
 	AND c1.concept_id IS NULL
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
+	oa1.analysis_name
+;
 
-	
 --ruleid 6 invalid concept_id
 INSERT INTO ACHILLES_HEEL_results (
 	analysis_id,
@@ -259,8 +259,8 @@ WHERE or1.analysis_id IN (
 		)
 	AND or1.stratum_1 = '0'
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
-
+	oa1.analysis_name
+;
 	
 --concept from the wrong vocabulary
 --ruleid 7 gender  - 12 HL7
@@ -284,8 +284,8 @@ WHERE or1.analysis_id IN (2)
 	AND c1.concept_id <> 0 
   AND lower(c1.domain_id) NOT IN ('gender')
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
-
+	oa1.analysis_name
+;
 	
 --ruleid 8 race  - 13 CDC Race
 INSERT INTO ACHILLES_HEEL_results (
@@ -308,8 +308,8 @@ WHERE or1.analysis_id IN (4)
 	AND c1.concept_id <> 0 
   AND lower(c1.domain_id) NOT IN ('race')
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
-
+	oa1.analysis_name
+;
 	
 --ruleid 9 ethnicity - 44 ethnicity
 INSERT INTO ACHILLES_HEEL_results (
@@ -332,8 +332,8 @@ WHERE or1.analysis_id IN (5)
 	AND c1.concept_id <> 0 
   AND lower(c1.domain_id) NOT IN ('ethnicity')
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
-
+	oa1.analysis_name
+;
 	
 --ruleid 10 place of service - 14 CMS place of service, 24 OMOP visit
 INSERT INTO ACHILLES_HEEL_results (
@@ -356,8 +356,8 @@ WHERE or1.analysis_id IN (202)
 	AND c1.concept_id <> 0 
   AND lower(c1.domain_id) NOT IN ('visit')
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
-
+	oa1.analysis_name
+;
 	
 --ruleid 11 specialty - 48 specialty
 INSERT INTO ACHILLES_HEEL_results (
@@ -380,8 +380,8 @@ WHERE or1.analysis_id IN (301)
 	AND c1.concept_id <> 0 
   AND lower(c1.domain_id) NOT IN ('provider specialty')
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
-
+	oa1.analysis_name
+;
 	
 --ruleid 12 condition occurrence, era - 1 SNOMED
 INSERT INTO ACHILLES_HEEL_results (
@@ -407,8 +407,8 @@ WHERE or1.analysis_id IN (
 	AND c1.concept_id <> 0 
   AND lower(c1.domain_id) NOT IN ('condition','condition/drug', 'condition/meas', 'condition/obs', 'condition/procedure')
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
-
+	oa1.analysis_name
+;
 	
 --ruleid 13 drug exposure - 8 RxNorm
 INSERT INTO ACHILLES_HEEL_results (
@@ -434,8 +434,8 @@ WHERE or1.analysis_id IN (
 	AND c1.concept_id <> 0 
   AND lower(c1.domain_id) NOT IN ('drug','condition/drug', 'device/drug', 'drug/measurement', 'drug/obs', 'drug/procedure')
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
-
+	oa1.analysis_name
+;
 	
 --ruleid 14 procedure - 4 CPT4/5 HCPCS/3 ICD9P
 INSERT INTO ACHILLES_HEEL_results (
@@ -458,15 +458,13 @@ WHERE or1.analysis_id IN (600)
 	AND c1.concept_id <> 0 
   AND lower(c1.domain_id) NOT IN ('procedure','condition/procedure', 'device/procedure', 'drug/procedure', 'obs/procedure')
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
+	oa1.analysis_name
+;
 
 --15 observation  - 6 LOINC
-
 --NOT APPLICABLE IN CDMv5
 
-
 --16 disease class - 40 DRG
-
 --NOT APPLICABLE IN CDMV5
 
 --ruleid 17 revenue code - 43 revenue code
@@ -490,8 +488,8 @@ WHERE or1.analysis_id IN (1610)
 	AND c1.concept_id <> 0 
   AND lower(c1.domain_id) NOT IN ('revenue code')
 GROUP BY or1.analysis_id,
-	oa1.analysis_name;
-
+	oa1.analysis_name
+;
 
 --ruleid 18 ERROR:  year of birth in the future
 INSERT INTO ACHILLES_HEEL_results (
@@ -512,8 +510,8 @@ WHERE or1.analysis_id IN (3)
 	AND CAST(or1.stratum_1 AS INT) > year(now())
 	AND or1.count_value > 0
 GROUP BY or1.analysis_id,
-  oa1.analysis_name;
-
+  oa1.analysis_name
+;
 
 --ruleid 19 WARNING:  year of birth < 1800
 INSERT INTO ACHILLES_HEEL_results (
@@ -533,8 +531,8 @@ WHERE or1.analysis_id IN (3)
 	AND cAST(or1.stratum_1 AS INT) < 1800
 	AND or1.count_value > 0
 GROUP BY or1.analysis_id,
-  oa1.analysis_name;
-
+  oa1.analysis_name
+;
   
 --ruleid 20 ERROR:  age < 0
 INSERT INTO ACHILLES_HEEL_results (
@@ -554,8 +552,8 @@ WHERE or1.analysis_id IN (101)
 	AND CAST(or1.stratum_1 AS INT) < 0
 	AND or1.count_value > 0
 GROUP BY or1.analysis_id,
-  oa1.analysis_name;
-
+  oa1.analysis_name
+;
   
 --ruleid 21 ERROR: age > 150  (TODO lower number seems more appropriate)
 INSERT INTO ACHILLES_HEEL_results (
@@ -575,8 +573,8 @@ WHERE or1.analysis_id IN (101)
 	AND CAST(or1.stratum_1 AS INT) > 150
 	AND or1.count_value > 0
 GROUP BY or1.analysis_id,
-  oa1.analysis_name;
-
+  oa1.analysis_name
+;
   
 --ruleid 22 WARNING:  monthly change > 100%
 INSERT INTO ACHILLES_HEEL_results (
@@ -605,8 +603,8 @@ WHERE (
 		OR CAST(ar1.stratum_1 AS INT) + 89 = CAST(ar2.stratum_1 AS INT)
 		)
 	AND 1.0 * abs(ar2.count_value - ar1.count_value) / ar1.count_value > 1
-	AND ar1.count_value > 10;
-
+	AND ar1.count_value > 10
+;
 	
 --ruleid 23 WARNING:  monthly change > 100% at concept level
 INSERT INTO ACHILLES_HEEL_results (
@@ -640,8 +638,8 @@ WHERE (
 	AND 1.0 * abs(ar2.count_value - ar1.count_value) / ar1.count_value > 1
 	AND ar1.count_value > 10
 GROUP BY ar1.analysis_id,
-	aa1.analysis_name;
-
+	aa1.analysis_name
+;
 	
 --ruleid 24 WARNING: days_supply > 180 
 INSERT INTO ACHILLES_HEEL_results (
@@ -660,8 +658,8 @@ INNER JOIN ACHILLES_analysis oa1
 	ON ord1.analysis_id = oa1.analysis_id
 WHERE ord1.analysis_id IN (715)
 	AND ord1.max_value > 180
-GROUP BY ord1.analysis_id, oa1.analysis_name;
-
+GROUP BY ord1.analysis_id, oa1.analysis_name
+;
 
 --ruleid 25 WARNING:  refills > 10
 INSERT INTO ACHILLES_HEEL_results (
@@ -680,8 +678,8 @@ INNER JOIN ACHILLES_analysis oa1
 	ON ord1.analysis_id = oa1.analysis_id
 WHERE ord1.analysis_id IN (716)
 	AND ord1.max_value > 10
-GROUP BY ord1.analysis_id, oa1.analysis_name;
-
+GROUP BY ord1.analysis_id, oa1.analysis_name
+;
 
 --ruleid 26 WARNING: quantity > 600
 INSERT INTO ACHILLES_HEEL_results (
@@ -700,5 +698,7 @@ INNER JOIN ACHILLES_analysis oa1
 	ON ord1.analysis_id = oa1.analysis_id
 WHERE ord1.analysis_id IN (717)
 	AND ord1.max_value > 600
-GROUP BY ord1.analysis_id, oa1.analysis_name;
+GROUP BY ord1.analysis_id, oa1.analysis_name
+;
 
+exit;

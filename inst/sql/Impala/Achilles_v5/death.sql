@@ -4,20 +4,19 @@ ACHILLES Analyses on DEATH table
 *********************************************/
 
 -- create raw data table based on DEATH for better performance
-create table death_raw as
-select person_id, gender_concept_id, death_type_concept_id, year_of_birth, dyear, dmonth, dday, 
-	cast(concat_ws('-', cast(dyear as string), lpad(cast(dmonth as string), 2, '0'), lpad(cast(dday as string), 2, '0')) as timestamp) as ddate
-from 
- (
-	select p.person_id, p.gender_concept_id, op.death_type_concept_id,
-	   cast(p.YEAR_OF_BIRTH as int) as year_of_birth, 
-	   cast(regexp_extract(death_date, '/(\\d+)$', 1) as int) as dyear,
-	   cast(regexp_extract(death_date, '^(\\d+)/', 1) as int) as dmonth,
-	   cast(regexp_extract(death_date, '/(\\d+)/', 1) as int) as dday
-	from PERSON p join death op on p.person_id = op.person_id
- ) t
-;
-
+-- create table death_raw as
+-- select person_id, gender_concept_id, death_type_concept_id, year_of_birth, dyear, dmonth, dday, 
+	-- cast(concat_ws('-', cast(dyear as string), lpad(cast(dmonth as string), 2, '0'), lpad(cast(dday as string), 2, '0')) as timestamp) as ddate
+-- from 
+ -- (
+	-- select p.person_id, p.gender_concept_id, op.death_type_concept_id,
+	   -- cast(p.YEAR_OF_BIRTH as int) as year_of_birth, 
+	   -- cast(regexp_extract(death_date, '/(\\d+)$', 1) as int) as dyear,
+	   -- cast(regexp_extract(death_date, '^(\\d+)/', 1) as int) as dmonth,
+	   -- cast(regexp_extract(death_date, '/(\\d+)/', 1) as int) as dday
+	-- from PERSON p join death op on p.person_id = op.person_id
+ -- ) t
+-- ;
 
 -- 500   Number of persons with death, by cause_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
@@ -32,10 +31,9 @@ group by d1.cause_concept_id
 -- 501   Number of records of death, by cause_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 501 as analysis_id, 
-   d1.cause_concept_id as stratum_1,
+   cast(d1.cause_concept_id as string) as stratum_1,
    count(d1.PERSON_ID) as count_value
-from
-   death d1
+from death d1
 group by d1.cause_concept_id
 ;
 
@@ -43,22 +41,26 @@ group by d1.cause_concept_id
 -- 502   Number of persons by condition occurrence start month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 502 as analysis_id,   
-   cast(dyear*100 + dmonth as string) as stratum_1, 
+   cast(year(cast(death_date as timestamp))*100 + month(cast(death_date as timestamp)) as string) as stratum_1, 
    count(distinct PERSON_ID) as count_value
-from death_raw d1
-group by dyear*100 + dmonth
+from death d1
+group by year(cast(death_date as timestamp))*100 + month(cast(death_date as timestamp))
 ;
 
 
 -- 504   Number of persons with a death, by calendar year by gender by age decile
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, stratum_3, count_value)
 select 504 as analysis_id,   
-   cast(dyear as string) as stratum_1,
-   cast(gender_concept_id as string) as stratum_2,
-   cast(floor((dyear - year_of_birth)/10) as string) as stratum_3, 
-   count(distinct PERSON_ID) as count_value
-from death_raw
-group by dyear, gender_concept_id, floor((dyear - year_of_birth)/10)
+   cast(year(cast(d1.death_date as timestamp)) as string) as stratum_1,
+   cast(p1.gender_concept_id as string) as stratum_2,
+   cast(floor((year(cast(d1.death_date as timestamp)) - p1.year_of_birth)/10) as string) as stratum_3, 
+   count(distinct p1.PERSON_ID) as count_value
+from PERSON p1
+	inner join death d1
+		on p1.person_id = d1.person_id
+group by year(cast(d1.death_date as timestamp)), 
+	p1.gender_concept_id, 
+	floor((year(cast(d1.death_date as timestamp)) - p1.year_of_birth)/10)
 ;
 
 
@@ -76,12 +78,14 @@ group by death_type_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select gender_concept_id as stratum_id, death_year - year_of_birth as count_value
-  from 
-	( select person_id, gender_concept_id, year_of_birth, min(dyear) as death_year
-	  from death_raw
-	  group by person_id, gender_concept_id, year_of_birth
-    ) d1
+  select gender_concept_id as stratum_id, 
+	death_year - year_of_birth as count_value
+  from PERSON p1
+	inner join
+	( select person_id, min(year(cast(death_date as timestamp))) as death_year
+	  from death
+	  group by person_id 
+    ) d1 on p1.person_id = d1.person_id
 ),
 overallStats as
 (
@@ -108,7 +112,7 @@ priorStats as
   group by s.stratum_id, s.count_value, s.total, s.rn
 )
 select 506 as analysis_id,
-  o.stratum_id,
+  cast(o.stratum_id as string),
   o.total as count_value,
   o.min_value,
   o.max_value,
@@ -139,9 +143,11 @@ where p1.person_id is null
 insert into ACHILLES_results (analysis_id, count_value)
 select 510 as analysis_id, 
    count(d1.PERSON_ID) as count_value
-from death_raw d1
-    left join observation_period_raw op1
-      on d1.person_id = op1.person_id  and d1.ddate >= op1.sdate and d1.ddate <= op1.edate
+from death d1
+	left join observation_period op1
+		on d1.person_id = op1.person_id
+			and cast(d1.death_date as timestamp) >= cast(op1.observation_period_start_date as timestamp)
+			and cast(d1.death_date as timestamp) <= cast(op1.observation_period_end_date as timestamp)
 where op1.person_id is null
 ;
 
@@ -161,15 +167,15 @@ select 511 as analysis_id,
    max(case when p1<=0.90 then count_value else -9999 end) as p90_value
 from
 (
-	select datediff(t0.max_date, d1.ddate) as count_value,
-	   1.0*(row_number() over (order by datediff(t0.max_date, d1.ddate)))/(count(*) over () + 1) as p1
-	from death_raw d1
-	   inner join
-	   (
-		  select person_id, max(sdate) as max_date
-		  from condition_occurrence_raw
-		  group by person_id
-	   ) t0 on d1.person_id = t0.person_id
+	select datediff(t0.max_date, cast(d1.death_date as timestamp)) as count_value,
+		1.0*(row_number() over (order by datediff(t0.max_date, cast(d1.death_date as timestamp))))/(count(*) over () + 1) as p1
+	from death d1
+		inner join
+		(
+			select person_id, max(cast(condition_start_date as timestamp)) as max_date
+			from condition_occurrence
+			group by person_id
+		) t0 on d1.person_id = t0.person_id
 ) t1
 ;
 
@@ -178,15 +184,15 @@ from
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select datediff(t0.max_date, d1.ddate) as count_value
-  from death_raw d1
-  inner join
-   (
-      select person_id, max(cast(drug_exposure_start_date as timestamp)) as max_date
-      from drug_exposure
-      group by person_id
-   ) t0
-   on d1.person_id = t0.person_id
+  select datediff(t0.max_date, cast(d1.death_date as timestamp)) as count_value
+  from death d1
+    inner join
+    (
+	   select person_id, max(cast(drug_exposure_start_date as timestamp)) as max_date
+	   from drug_exposure
+	   group by person_id
+    ) t0
+    on d1.person_id = t0.person_id
 ),
 overallStats as
 (
@@ -233,15 +239,14 @@ group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select datediff(t0.max_date, d1.ddate) as count_value
-  from death_raw d1
+  select datediff(t0.max_date, cast(d1.death_date as timestamp)) as count_value
+  from death d1
    inner join
    (
       select person_id, max(visit_start_date) as max_date
       from visit_occurrence
       group by person_id
-   ) t0
-   on d1.person_id = t0.person_id
+   ) t0 on d1.person_id = t0.person_id
 ),
 overallStats as
 (
@@ -288,15 +293,14 @@ group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select datediff(t0.max_date, d1.ddate) as count_value
-  from death_raw d1
+  select datediff(t0.max_date, cast(d1.death_date as timestamp)) as count_value
+  from death d1
    inner join
    (
       select person_id, max(cast(procedure_date as timestamp)) as max_date
       from procedure_occurrence
       group by person_id
-   ) t0
-   on d1.person_id = t0.person_id
+   ) t0 on d1.person_id = t0.person_id
 ),
 overallStats as
 (
@@ -343,15 +347,14 @@ group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
 (
-  select datediff(t0.max_date, d1.ddate) as count_value
-  from death_raw d1
+  select datediff(t0.max_date, cast(d1.death_date as timestamp)) as count_value
+  from death d1
    inner join
    (
       select person_id, max(cast(observation_date as timestamp)) as max_date
       from observation
       group by person_id
-   ) t0
-   on d1.person_id = t0.person_id
+   ) t0 on d1.person_id = t0.person_id
 ),
 overallStats as
 (
@@ -393,3 +396,4 @@ cross join overallStats o
 group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
+exit;

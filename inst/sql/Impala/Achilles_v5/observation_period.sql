@@ -5,7 +5,6 @@ ACHILLES Analyses on OBSERVATION_PERIOD table
 
 -- 101   Number of persons by age, with age at first observation period
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
-
 select 101 as analysis_id,   
 	cast(year(op1.index_date) - p1.YEAR_OF_BIRTH as string) as stratum_1, 
 	count(p1.person_id) as count_value
@@ -14,7 +13,6 @@ from PERSON p1
    on p1.PERSON_ID = op1.PERSON_ID
 group by year(op1.index_date) - p1.YEAR_OF_BIRTH
 ;
-
 
 -- 102   Number of persons by gender by age, with age at first observation period
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
@@ -27,7 +25,6 @@ from PERSON p1
    on p1.PERSON_ID = op1.PERSON_ID
 group by p1.gender_concept_id, year(op1.index_date) - p1.YEAR_OF_BIRTH
 ;
-
 
 -- 103   Distribution of age at first observation period
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -76,7 +73,6 @@ from ageStatsPrior p
 cross join overallStats o
 group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
-
 
 -- 104   Distribution of age at first observation period by gender
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -127,7 +123,6 @@ from ageStatsPrior p
 join overallStats o on p.gender_concept_id = o.gender_concept_id
 group by o.gender_concept_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
-
 
 -- 105   Length of observation (days) of first observation period
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -186,7 +181,6 @@ cross join overallStats o
 group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 106   Length of observation (days) of first observation period by gender
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
@@ -241,7 +235,6 @@ from priorStats p
 join overallStats o on p.gender_concept_id = o.gender_concept_id
 group by o.gender_concept_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
-
 
 -- 107   Length of observation (days) of first observation period by age decile
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -304,7 +297,6 @@ join overallStats o on p.age_decile = o.age_decile
 group by o.age_decile, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 108   Number of persons by length of observation period, in 30d increments
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 108 as analysis_id,  
@@ -323,7 +315,6 @@ from PERSON p1
 group by floor(DATEDIFF(cast(op1.observation_period_end_date as timestamp), cast(op1.observation_period_start_date as timestamp))/30)
 ;
 
-
 -- 109   Number of persons with continuous observation in each year
 -- Fetched 0 row(s) in 2854.18s ?????
 INSERT INTO ACHILLES_results (analysis_id, stratum_1, count_value)
@@ -334,20 +325,20 @@ with td as
 		CAST(concat_ws('-', cast(YEAR(cast(observation_period_start_date as timestamp)) as string), '01', '01') AS timestamp) AS obs_year_start,
 		CAST(concat_ws('-', cast(YEAR(cast(observation_period_start_date as timestamp)) AS string), '12', '31') AS timestamp) AS obs_year_end
 	FROM observation_period
+	WHERE observation_period_start_date is not null
 )
 SELECT
   109 AS analysis_id,
    cast(obs_year as string) AS stratum_1,
    count(DISTINCT person_id) AS count_value
 FROM observation_period, td
-WHERE
+WHERE observation_period_start_date is not null and observation_period_end_date is not null and 
       cast(observation_period_start_date as timestamp) <= obs_year_start
    AND
       cast(observation_period_end_date as timestamp) >= obs_year_end
 GROUP BY 
    obs_year
 ;
-
 
 -- 110   Number of persons with continuous observation in each month
 INSERT INTO ACHILLES_results (analysis_id, stratum_1, count_value)
@@ -366,16 +357,14 @@ WHERE cast(observation_period_start_date as timestamp) <= obs_month_start and  c
 group by obs_month
 ;
 
-
 -- 111   Number of persons by observation period start month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 111 as analysis_id, 
 	cast(YEAR(cast(observation_period_start_date as timestamp))*100 + MONTH(cast(observation_period_start_date as timestamp)) as string) as stratum_1, 
 	count(distinct PERSON_ID) as count_value
-from OBSERVATION_PERIOD_RAW 
+from OBSERVATION_PERIOD
 group by YEAR(cast(observation_period_start_date as timestamp))*100 + MONTH(cast(observation_period_start_date as timestamp))
 ;
-
 
 -- 112   Number of persons by observation period end month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
@@ -386,7 +375,6 @@ from observation_period
 group by YEAR(cast(observation_period_end_date as timestamp))*100 + MONTH(cast(observation_period_end_date as timestamp))
 ;
 
-
 -- 113   Number of persons by number of observation periods
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 113 as analysis_id,
@@ -396,7 +384,6 @@ from
    (select person_id, count(cast(OBSERVATION_period_start_date as timestamp)) as num_periods from OBSERVATION_PERIOD group by PERSON_ID) op1
 group by op1.num_periods
 ;
-
 
 -- 114   Number of persons with observation period before year-of-birth
 insert into ACHILLES_results (analysis_id, count_value)
@@ -409,7 +396,6 @@ from
 where p1.year_of_birth > op1.first_obs_year
 ;
 
-
 -- 115   Number of persons with observation period end < start
 insert into ACHILLES_results (analysis_id, count_value)
 select 115 as analysis_id,  count(op1.PERSON_ID) as count_value
@@ -417,16 +403,14 @@ from  observation_period op1
 where cast(op1.observation_period_end_date as timestamp) < cast(op1.observation_period_start_date as timestamp)
 ;
 
-
 -- 116   Number of persons with at least one day of observation in each year by gender and age decile
 -- Fetched 0 row(s) in 2512.55s ???
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, stratum_3, count_value)
 with t1 as 
 (
-	select distinct
-	  YEAR(cast(observation_period_start_date as timestamp)) as obs_year
-	from
-	  OBSERVATION_PERIOD
+	select distinct YEAR(cast(observation_period_start_date as timestamp)) as obs_year
+	from OBSERVATION_PERIOD
+	where observation_period_start_date is not null
 )
 select 116 as analysis_id,
         cast(t1.obs_year as string) as stratum_1,
@@ -442,11 +426,12 @@ from
         t1
 where year(cast(op1.OBSERVATION_PERIOD_START_DATE as timestamp)) <= t1.obs_year
         and year(cast(op1.OBSERVATION_PERIOD_END_DATE as timestamp)) >= t1.obs_year
+		and op1.observation_period_start_date is not null
+		and op1.observation_period_end_date is not null
 group by t1.obs_year,
         p1.gender_concept_id,
         floor((t1.obs_year - p1.year_of_birth)/10)
 ;
-
 
 -- 117   Number of persons with at least one day of observation in each year by gender and age decile
 -- Fetched 0 row(s) in 2919.40s ???
@@ -457,12 +442,14 @@ select 117 as analysis_id,
 from
    observation_period op1,
    (select distinct YEAR(cast(observation_period_start_date as timestamp))*100 + month(cast(observation_period_start_date as timestamp)) as  obs_month 
-    from observation_period) t1
+    from observation_period
+	where observation_period_start_date is not null) t1
 where year(cast(op1.observation_period_start_date as timestamp))*100 + month(cast(op1.observation_period_start_date as timestamp)) <= t1.obs_month
-   and YEAR(cast(observation_period_end_date as timestamp))*100 + MONTH(cast(observation_period_end_date as timestamp)) >= t1.obs_month
+   and YEAR(cast(op1.observation_period_end_date as timestamp))*100 + MONTH(cast(op1.observation_period_end_date as timestamp)) >= t1.obs_month
+   and op1.observation_period_start_date is not null
+   and op1.observation_period_end_date is not null
 group by t1.obs_month
 ;
-
 
 -- 118  Number of observation period records with invalid person_id
 insert into ACHILLES_results (analysis_id, count_value)
@@ -474,3 +461,5 @@ from
   on p1.person_id = op1.person_id
 where p1.person_id is null
 ;
+
+exit;

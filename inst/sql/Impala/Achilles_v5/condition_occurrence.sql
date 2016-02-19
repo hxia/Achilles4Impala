@@ -1,5 +1,4 @@
 
-
 /**********************************************************
 ACHILLES Analyses on CONDITION_OCCURRENCE table
 ***********************************************************/
@@ -24,7 +23,6 @@ ACHILLES Analyses on CONDITION_OCCURRENCE table
  -- ) t
 -- ;
 
-
 -- 400   Number of persons with at least one condition occurrence, by condition_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 400 as analysis_id, 
@@ -33,7 +31,6 @@ select 400 as analysis_id,
 from condition_occurrence co1
 group by co1.condition_CONCEPT_ID
 ;
-
 
 -- 401   Number of condition occurrence records, by condition_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
@@ -44,7 +41,6 @@ from condition_occurrence co1
 group by co1.condition_CONCEPT_ID
 ;
 
-
 -- 402   Number of persons by condition occurrence start month, by condition_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
 select 402 as analysis_id,   
@@ -54,7 +50,6 @@ select 402 as analysis_id,
 from condition_occurrence
 group by condition_concept_id, year(cast(condition_start_date as timestamp))*100 + month(cast(condition_start_date as timestamp))
 ;
-
 
 -- 403   Number of distinct condition occurrence concepts per person
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -104,7 +99,6 @@ cross join overallStats o
 group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 404   Number of persons with at least one condition occurrence, by condition_concept_id by calendar year by gender by age decile
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, stratum_3, stratum_4, count_value)
 select 404 as analysis_id,   
@@ -121,7 +115,6 @@ group by condition_concept_id,
 	floor((year(cast(condition_start_date as timestamp)) - year_of_birth)/10)
 ;
 
-
 -- 405   Number of condition occurrence records, by condition_concept_id by condition_type_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
 select 405 as analysis_id, 
@@ -133,7 +126,6 @@ from
 group by co1.condition_CONCEPT_ID,   
    co1.condition_type_concept_id
 ;
-
 
 -- 406   Distribution of age by condition_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, stratum_2, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -192,7 +184,6 @@ join overallStats o on p.stratum1_id = o.stratum1_id and p.stratum2_id = o.strat
 group by o.stratum1_id, o.stratum2_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 409   Number of condition occurrence records with invalid person_id
 insert into ACHILLES_results (analysis_id, count_value)
 select 409 as analysis_id,  
@@ -203,7 +194,6 @@ from
    on p1.person_id = co1.person_id
 where p1.person_id is null
 ;
-
 
 -- 410   Number of condition occurrence records outside valid observation period
 insert into ACHILLES_results (analysis_id, count_value)
@@ -218,14 +208,12 @@ from
 where op1.person_id is null
 ;
 
-
 -- 411   Number of condition occurrence records with end date < start date
 insert into ACHILLES_results (analysis_id, count_value)
 select 411 as analysis_id, count(co1.PERSON_ID) as count_value
 from condition_occurrence co1
 where cast(co1.condition_end_date as timestamp) < cast(co1.condition_start_date as timestamp)
 ;
-
 
 -- 412   Number of condition occurrence records with invalid provider_id
 insert into ACHILLES_results (analysis_id, count_value)
@@ -239,7 +227,6 @@ where co1.provider_id is not null
    and p1.provider_id is null
 ;
 
-
 -- 413   Number of condition occurrence records with invalid visit_id
 insert into ACHILLES_results (analysis_id, count_value)
 select 413 as analysis_id,  
@@ -252,7 +239,6 @@ where co1.visit_occurrence_id is not null
    and vo1.visit_occurrence_id is null
 ;
 
-
 -- 420   Number of condition occurrence records by condition occurrence start month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 420 as analysis_id,   
@@ -262,3 +248,4 @@ from condition_occurrence
 group by year(cast(condition_start_date as timestamp))*100 + month(cast(condition_start_date as timestamp))
 ;
 
+exit;

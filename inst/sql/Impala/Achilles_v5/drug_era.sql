@@ -23,7 +23,6 @@ ACHILLES Analyses on DRUG_ERA table
  -- ) t
 -- ;
 
-
 -- 900   Number of persons with at least one drug occurrence, by drug_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 900 as analysis_id, 
@@ -33,7 +32,6 @@ from drug_era de1
 group by de1.drug_CONCEPT_ID
 ;
 
-
 -- 901   Number of drug occurrence records, by drug_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
 select 901 as analysis_id, 
@@ -42,7 +40,6 @@ select 901 as analysis_id,
 from drug_era de1
 group by de1.drug_CONCEPT_ID
 ;
-
 
 -- 902   Number of persons by drug occurrence start month, by drug_concept_id
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, count_value)
@@ -54,7 +51,6 @@ from drug_era de1
 group by de1.drug_concept_id, 
 	year(cast(drug_era_start_date as timestamp))*100 + month(cast(drug_era_start_date as timestamp))
 ;
-
 
 -- 903   Number of distinct drug era concepts per person
 insert into ACHILLES_results_dist (analysis_id, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -104,7 +100,6 @@ cross join overallStats o
 group by o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 904   Number of persons with at least one drug occurrence, by drug_concept_id by calendar year by gender by age decile
 insert into ACHILLES_results (analysis_id, stratum_1, stratum_2, stratum_3, stratum_4, count_value)
 select 904 as analysis_id,   
@@ -120,7 +115,6 @@ group by drug_concept_id,
 	gender_concept_id, 
 	floor(year(cast(drug_era_start_date as timestamp)) - year_of_birth)/10
 ;
-
 
 -- 906   Distribution of age by drug_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, stratum_2, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
@@ -180,7 +174,6 @@ join overallStats o on p.stratum1_id = o.stratum1_id and p.stratum2_id = o.strat
 group by o.stratum1_id, o.stratum2_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 907   Distribution of drug era length, by drug_concept_id
 insert into ACHILLES_results_dist (analysis_id, stratum_1, count_value, min_value, max_value, avg_value, stdev_value, median_value, p10_value, p25_value, p75_value, p90_value)
 with rawData as
@@ -233,7 +226,6 @@ join overallStats o on p.stratum1_id = o.stratum1_id
 group by p.stratum1_id, o.total, o.min_value, o.max_value, o.avg_value, o.stdev_value
 ;
 
-
 -- 908   Number of drug eras with invalid person
 insert into ACHILLES_results (analysis_id, count_value)
 select 908 as analysis_id,  
@@ -242,7 +234,6 @@ from drug_era de1
    left join PERSON p1 on p1.person_id = de1.person_id
 where p1.person_id is null
 ;
-
 
 -- 909   Number of drug eras outside valid observation period
 insert into ACHILLES_results (analysis_id, count_value)
@@ -257,7 +248,6 @@ from
 where op1.person_id is null
 ;
 
-
 -- 910   Number of drug eras with end date < start date
 insert into ACHILLES_results (analysis_id, count_value)
 select 910 as analysis_id,
@@ -266,7 +256,6 @@ from
    drug_era de1
 where cast(de1.drug_era_end_date as timestamp) < cast(de1.drug_era_start_date as timestamp)
 ;
-
 
 -- 920   Number of drug era records by drug era start month
 insert into ACHILLES_results (analysis_id, stratum_1, count_value)
@@ -277,3 +266,4 @@ from drug_era de1
 group by year(cast(drug_era_start_date as timestamp))*100 + month(cast(drug_era_start_date as timestamp))
 ;
 
+exit;

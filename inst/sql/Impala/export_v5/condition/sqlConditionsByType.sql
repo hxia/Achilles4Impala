@@ -27,7 +27,7 @@ from @results_database_schema.ACHILLES_results ar1
                     else '' end
 			 ) as concept_group_name
        from @cdm_database_schema.concept
-       where lower(domain_id) = 'condition type' 
+       where lower(domain_id) = 'condition' 
        ) c2
        on ar1.stratum_2 = cast(c2.concept_id as string)
 where ar1.analysis_id = 405
